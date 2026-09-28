@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>JurisClik — Peças, jurisprudência, prazos e cálculos. Uma ferramenta.</title>
+<meta name="description" content="O JurisClik redige a minuta a partir do seu relato, pesquisa jurisprudência com link do tribunal, aponta o que exige ação no processo e calcula verbas trabalhistas com memória. Teste grátis, sem cartão.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+/* ============ CONFIGURAÇÃO DE LINKS (edite aqui) ============ */
+/* Ver bloco <script> no fim: APP_URL e CHECKOUT_URLS. */
+
+:root{
+  --neon:#E2FF1A; --neon-ink:#6B6F00; --neon-soft:rgba(226,255,26,.16); --neon-border:rgba(199,214,0,.55);
+  --bg:#F5F5F3; --card:#FFFFFF; --border:#E5E7EB; --border-strong:#D0D5DD;
+  --hi:#172033; --mid:#667085; --low:#98A2B3; --ink:#111318; --ink-2:#15181F; --ink-3:#0C0E12;
+  --on-dark:#FFFFFF; --on-dark-mid:#9AA4B2; --on-dark-low:#7B8494; --on-dark-hi:#C9CFD8;
+  --success:#15803D; --error:#B91C1C;
+  --radius:16px; --font:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif; --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-behavior:smooth;scroll-padding-top:calc(72px + env(safe-area-inset-top,0px))}
+body{margin:0;background:var(--bg);color:var(--hi);font-family:var(--font);-webkit-font-smoothing:antialiased;line-height:1.5}
+img{max-width:100%}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+@media(min-width:640px){.wrap{padding:0 32px}}
+h1,h2,h3{margin:0;letter-spacing:-.02em;line-height:1.08}
+h2{font-size:28px;font-weight:600}
+@media(min-width:640px){h2{font-size:40px}}
+p{margin:0}
+.lead{font-size:15px;color:var(--mid);line-height:1.6}
+@media(min-width:640px){.lead{font-size:17px}}
+.dark{background:var(--ink);color:var(--on-dark)}
+.dark h2{color:#fff}.dark .lead{color:var(--on-dark-mid)}
+section{padding:64px 0}
+@media(min-width:640px){section{padding:96px 0}}
+.rev{opacity:0;transform:translateY(12px);transition:opacity .55s ease,transform .55s ease}.rev.on{opacity:1;transform:none}
+.tabular{font-variant-numeric:tabular-nums}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:13px;padding:10px 16px;border-radius:10px;transition:all .2s ease;white-space:nowrap}
+.btn-neon{background:var(--neon);color:var(--ink);border:1px solid #C7D600;box-shadow:0 2px 12px rgba(199,214,0,.3)}
+.btn-neon:hover{box-shadow:0 0 0 3px rgba(226,255,26,.3),0 6px 20px rgba(199,214,0,.22)}
+.btn-ghost-dark{color:#fff;border:1px solid rgba(255,255,255,.18)}.btn-ghost-dark:hover{background:rgba(255,255,255,.05)}
+.btn-sm{font-size:12px;padding:8px 12px}.btn-full{width:100%}
+:focus-visible{outline:2px solid #C7D600;outline-offset:2px}
+
+/* NAV */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);background:rgba(17,19,24,0);border-bottom:1px solid transparent;transition:background .3s,box-shadow .3s,border-color .3s;padding-top:env(safe-area-inset-top,0px)}
+.nav.on{background:rgba(17,19,24,.92);border-color:rgba(255,255,255,.08);box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.nav .wrap{height:64px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.nav-links{display:none;gap:28px;font-size:13.5px;font-weight:500;color:var(--on-dark-hi)}
+@media(min-width:768px){.nav-links{display:flex}}
+.nav-links a{position:relative;padding-bottom:2px}.nav-links a:hover,.nav-links a.on{color:#fff}
+.nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:2px;border-radius:99px;background:var(--neon);transform:scaleX(0);transform-origin:left;transition:transform .25s}.nav-links a.on::after{transform:scaleX(1)}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-mark{width:36px;height:36px;border-radius:10px;background:var(--neon);display:grid;place-items:center;box-shadow:0 0 18px rgba(226,255,26,.25)}
+.logo-text{font-weight:700;font-size:15px;letter-spacing:-.01em;color:#fff;line-height:1.1}
+.logo-sub{font-size:10px;color:var(--on-dark-mid)}
+.logo.light .logo-text{color:var(--hi)}
+
+/* HERO */
+.hero{position:relative;overflow:hidden;background:var(--ink);margin-top:-64px;padding:128px 0 80px}
+@media(min-width:640px){.hero{padding:160px 0 112px}}
+.hero-grid{position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:56px 56px;-webkit-mask-image:radial-gradient(ellipse 70% 60% at 50% 20%,#000 30%,transparent 75%);mask-image:radial-gradient(ellipse 70% 60% at 50% 20%,#000 30%,transparent 75%);animation:gridIn 1.4s ease both}
+.hero-glow{position:absolute;left:50%;top:-160px;width:900px;height:520px;transform:translateX(-50%);border-radius:50%;pointer-events:none;background:radial-gradient(ellipse at center,rgba(226,255,26,.13),transparent 62%)}
+.hero-inner{position:relative;text-align:center;max-width:760px;margin:0 auto}
+.stage>*{animation:stage .7s cubic-bezier(.16,1,.3,1) both}
+.stage>*:nth-child(1){animation-delay:.05s}.stage>*:nth-child(2){animation-delay:.15s}.stage>*:nth-child(3){animation-delay:.25s}.stage>*:nth-child(4){animation-delay:.35s}.stage>*:nth-child(5){animation-delay:.45s}
+@keyframes stage{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes gridIn{from{opacity:0}to{opacity:1}}
+.pill{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:500;padding:6px 12px;border-radius:99px;color:#E6E9EE;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
+.dot{width:6px;height:6px;border-radius:99px;background:var(--neon);box-shadow:0 0 10px var(--neon)}
+.hero h1{font-size:38px;font-weight:600;letter-spacing:-.03em;line-height:1.02;color:#fff;margin-top:24px}
+@media(min-width:640px){.hero h1{font-size:60px}}
+.hero .lead{color:var(--on-dark-mid);margin:24px auto 0;max-width:640px;font-size:16px}
+@media(min-width:640px){.hero .lead{font-size:19px}}
+.hero-ctas{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:32px}
+.hero-note{font-size:13px;color:var(--on-dark-low);margin-top:20px}
+.frame-wrap{position:relative;max-width:1000px;margin:48px auto 0;animation:frameIn .9s cubic-bezier(.16,1,.3,1) .3s both}
+@keyframes frameIn{from{opacity:0;transform:translateY(24px) scale(.985)}to{opacity:1;transform:none}}
+.seg{display:inline-flex;padding:4px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08)}
+.seg button{font-size:12.5px;font-weight:600;padding:6px 16px;border-radius:9px;color:var(--on-dark-hi);transition:all .2s}.seg button.on{background:var(--neon);color:var(--ink)}
+.seg-light{background:rgba(255,255,255,.06)}
+.swap{animation:swap .38s cubic-bezier(.16,1,.3,1) both}@keyframes swap{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* MOLDURAS */
+.mold{border-radius:var(--radius);overflow:hidden;background:var(--card);border:1px solid var(--border);box-shadow:0 30px 80px rgba(17,19,24,.18)}
+.mold-bar{display:flex;align-items:center;gap:6px;padding:10px 14px;border-bottom:1px solid var(--border);background:#FAFAFA}
+.mold-bar i{width:10px;height:10px;border-radius:99px;display:block}
+.mold-bar span{margin-left:12px;font-size:11px;font-weight:500;color:var(--low);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mold-body{padding:14px}
+@media(min-width:640px){.mold-body{padding:16px}}
+.phone{margin:0 auto;width:330px;max-width:100%;border-radius:34px;padding:10px;background:var(--ink);box-shadow:0 30px 80px rgba(17,19,24,.35),0 0 0 1px rgba(255,255,255,.08) inset}
+.phone-in{border-radius:26px;overflow:hidden;background:var(--bg)}
+.phone-top{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 6px;font-size:10px;font-weight:600;color:var(--hi)}
+.phone-top b{width:64px;height:16px;border-radius:99px;background:var(--ink);margin:0 auto}
+.phone-title{padding:0 10px 12px;font-size:10px;font-weight:500;color:var(--low)}
+.phone-body{padding:0 10px 12px;max-height:520px;overflow:hidden}
+
+/* Demo pieces */
+.d-col{display:flex;flex-direction:column;gap:12px}
+.ross-bar{border-radius:16px;padding:16px;background:var(--ink);display:flex;flex-direction:column;gap:12px}
+@media(min-width:640px){.ross-bar{flex-direction:row;align-items:center}}
+.ross-id{display:flex;align-items:center;gap:12px}
+.ross-av{width:40px;height:40px;border-radius:99px;background:var(--neon);display:grid;place-items:center;color:var(--ink);font-weight:700;font-size:14px;animation:rossPulse 2.8s ease-in-out infinite;flex-shrink:0}
+.ross-av.sm{width:24px;height:24px;font-size:10px;animation:none}
+@keyframes rossPulse{0%,100%{box-shadow:0 0 0 0 rgba(226,255,26,.55)}50%{box-shadow:0 0 0 7px rgba(226,255,26,0)}}
+.ross-k{font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--neon)}
+.ross-q{font-size:15px;font-weight:600;color:#fff}
+.chips{flex:1;display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+@media(min-width:640px){.chips{grid-template-columns:repeat(3,1fr)}}
+.chips span{font-size:11px;font-weight:500;padding:6px 10px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:#E6E9EE;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+@media(min-width:640px){.kpis{grid-template-columns:repeat(3,1fr)}}
+.kpi{border-radius:12px;padding:12px;background:var(--card);border:1px solid var(--border)}
+.kpi.a{border-color:var(--neon-border)}
+.kpi b{display:block;font-size:18px;font-weight:600;letter-spacing:-.01em;white-space:nowrap}.kpi b.money{font-size:14px;padding-top:3px}
+.kpi small{display:block;font-size:11px;font-weight:500;color:var(--hi)}.kpi em{display:block;font-style:normal;font-size:10px;color:var(--low)}
+.inp{display:flex;align-items:center;gap:8px;border-radius:12px;padding:10px 14px;border:1px solid var(--border-strong);box-shadow:0 0 0 3px rgba(226,255,26,.3),0 6px 20px rgba(199,214,0,.22);font-size:13px}
+.sug{border-radius:12px;padding:10px 14px;background:var(--ink);display:flex;align-items:center;gap:10px;color:#fff}
+.sug b{font-size:12.5px;font-weight:600;display:block}.sug small{font-size:11px;color:var(--on-dark-mid)}
+.box{border-radius:12px;padding:14px;background:var(--card);border:1px solid var(--border)}
+.box h4{margin:0 0 8px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--mid)}
+.fact{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:2px 0}.fact i{color:var(--success)}.fact span:first-of-type{width:96px;color:var(--mid)}
+.msg{display:flex;gap:8px;align-items:flex-start;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.bubble{font-size:12.5px;border-radius:12px;border-top-left-radius:6px;padding:8px 12px;background:#FAFAFA;border:1px solid var(--border)}
+.paper{padding:16px;background:#fff;border:1px solid var(--border);font-family:'Times New Roman',serif;font-size:11.5px;line-height:1.45}
+.paper .tb{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px;font-family:var(--font)}.paper .tb span{font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:#F2F4F7;color:var(--ink)}.paper .tb span.on{background:var(--neon)}
+.paper h5{margin:0 0 6px;font-size:13.5px;font-weight:700;text-transform:uppercase}.paper p{text-align:justify;margin:0 0 8px}.paper blockquote{margin:6px 0 6px 18%;color:var(--mid)}
+.editor{display:grid;grid-template-columns:1fr 120px;gap:12px}@media(min-width:640px){.editor{grid-template-columns:1fr 150px}}
+.side{display:flex;flex-direction:column;gap:6px}.side span{font-size:10.5px;font-weight:500;padding:4px 8px;border-radius:99px;text-align:center;border:1px solid var(--border);color:var(--mid);background:var(--card)}.side span.on{background:var(--ink);color:var(--neon)}
+.side span.ac{border-radius:8px;text-align:left;font-size:10px;color:var(--hi)}
+.chat{display:flex;flex-direction:column;gap:10px;background:var(--bg);padding:4px}
+.me{align-self:flex-end;max-width:85%;font-size:12.5px;padding:8px 12px;border-radius:16px;border-bottom-right-radius:6px;background:var(--ink);color:#fff}
+.them{display:flex;gap:8px}.them .b{max-width:90%;padding:10px 12px;border-radius:16px;border-bottom-left-radius:6px;background:var(--card);border:1px solid var(--border);font-size:12.5px}
+.them .b p{margin:0 0 6px}.them .acts{display:flex;gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}.them .acts span{font-size:10.5px;padding:4px 8px;border-radius:8px;border:1px solid var(--border)}
+.note{font-size:10px;color:var(--low)}
+.juris{border-radius:12px;padding:14px;background:var(--card);border:1px solid var(--border)}
+.juris .hd{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--low);flex-wrap:wrap}.juris .hd b{font-size:11px;padding:2px 8px;border-radius:99px;background:var(--ink);color:var(--neon)}.juris .hd em{font-style:normal;padding:2px 8px;border-radius:99px;background:#EAF7EF;color:var(--success);font-weight:600}
+.juris h6{margin:8px 0 4px;font-size:13px;font-weight:600}.juris p{font-size:12px;color:var(--mid)}.juris .ft{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:11px;color:var(--low)}.juris .ft span{font-weight:600;padding:5px 10px;border-radius:8px;background:var(--neon);color:var(--ink)}
+.and{border-radius:12px;padding:12px 14px;background:#FBFDF0;border:1px solid var(--neon-border)}.and .m{display:flex;gap:8px;align-items:center;font-size:11px;color:var(--low);font-family:var(--mono)}.and .m b{font-family:var(--font);font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;background:var(--neon);color:var(--ink)}.and .t{font-size:12px;text-transform:uppercase;margin-top:2px}
+.sugc{border-radius:12px;padding:14px;background:var(--card);border:1px solid var(--border)}.sugc .k{display:flex;gap:6px;flex-wrap:wrap;font-size:10.5px}.sugc .k span{padding:2px 8px;border-radius:99px;border:1px solid var(--border);color:var(--mid)}.sugc .k span.p{background:var(--ink);color:var(--neon);border-color:var(--ink)}
+.sugc h6{margin:8px 0 4px;font-size:14px;font-weight:600}.sugc p{font-size:12px;color:var(--mid)}.sugc .acts{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}.sugc .acts span{font-size:11px;font-weight:600;padding:6px 10px;border-radius:8px;border:1px solid var(--border)}.sugc .acts span.p{background:var(--neon);border-color:#C7D600}
+.week{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.day{border-radius:8px;padding:6px;min-height:92px;display:flex;flex-direction:column;gap:4px;background:var(--card);border:1px solid var(--border)}.day.on{background:var(--neon-soft);border-color:#C7D600}
+.day .h{font-size:10px;text-transform:uppercase;color:var(--low)}.day .h b{color:var(--hi)}.ev{font-size:9.5px;font-weight:500;padding:3px 5px;border-radius:5px;border-left:2px solid;background:var(--card);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.drop{font-size:10px;font-weight:600;padding:4px 6px;border-radius:4px;background:var(--ink);color:var(--neon)}
+.calc{border-radius:12px;overflow:hidden;border:1px solid var(--border)}.calc .r{display:flex;justify-content:space-between;padding:8px 14px;font-size:12px;border-bottom:1px solid var(--border)}.calc .r:nth-child(even){background:#FAFAFA}.calc .r b{font-family:var(--mono);font-weight:500}
+.calc .tot{display:flex;justify-content:space-between;padding:10px 14px;font-size:13px;font-weight:600;background:var(--ink);color:#fff}.calc .tot b{color:var(--neon)}
+
+/* MARQUEE */
+.marquee{position:relative;overflow:hidden;background:var(--ink-3);border-top:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08)}
+.marquee::before,.marquee::after{content:"";position:absolute;top:0;bottom:0;width:80px;z-index:1;pointer-events:none}.marquee::before{left:0;background:linear-gradient(90deg,var(--ink-3),transparent)}.marquee::after{right:0;background:linear-gradient(270deg,var(--ink-3),transparent)}
+.track{display:flex;gap:40px;padding:14px 0;width:max-content;white-space:nowrap;animation:marquee 38s linear infinite}.marquee:hover .track{animation-play-state:paused}
+.track span{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:var(--on-dark-hi)}.track i{width:6px;height:6px;border-radius:99px;background:var(--neon)}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* CUSTO */
+.cells{display:grid;grid-template-columns:1fr;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+@media(min-width:768px){.cells{grid-template-columns:repeat(3,1fr)}}
+.cell{padding:28px;background:var(--card)}.cell b{display:block;font-size:26px;font-weight:600;letter-spacing:-.02em}@media(min-width:640px){.cell b{font-size:30px}}.cell p{font-size:14.5px;color:var(--mid);margin-top:8px;line-height:1.55}
+.custo-note{text-align:center;font-size:15px;font-weight:500;margin-top:32px}@media(min-width:640px){.custo-note{font-size:17px}}
+
+/* TOUR */
+.tour{display:grid;grid-template-columns:1fr;gap:24px}@media(min-width:1024px){.tour{grid-template-columns:300px 1fr;gap:40px}}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin:0 -20px;padding-left:20px;padding-right:20px}
+@media(min-width:1024px){.tabs{flex-direction:column;overflow:visible;margin:0;padding:0}}
+.tab{position:relative;flex-shrink:0;text-align:left;border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px;min-width:200px;border:1px solid var(--border);color:var(--hi);transition:all .2s}
+.tab:hover{border-color:var(--border-strong)}.tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.tab svg{flex-shrink:0;color:var(--low)}.tab.on svg{color:var(--neon)}
+.tab b{display:block;font-size:13.5px;font-weight:600;white-space:nowrap}.tab small{display:block;font-size:11.5px;color:var(--low);white-space:nowrap}.tab.on small{color:var(--on-dark-mid)}
+.prog{position:absolute;left:12px;right:12px;bottom:4px;height:2px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;display:none}.tab.on.auto .prog{display:block}
+.prog i{display:block;height:100%;background:var(--neon);animation:prog 7s linear both}@keyframes prog{from{width:0}to{width:100%}}
+.panel{display:none}.panel.on{display:block;animation:swap .38s cubic-bezier(.16,1,.3,1) both}
+.panel-text{display:grid;grid-template-columns:1fr;gap:16px;margin-top:20px}@media(min-width:640px){.panel-text{grid-template-columns:1fr auto;align-items:center}}
+.panel-text b{display:block;font-size:17px;font-weight:600;letter-spacing:-.01em}@media(min-width:640px){.panel-text b{font-size:19px}}
+.panel-text p{font-size:14px;color:var(--mid);margin-top:6px;line-height:1.55}
+.gain{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;padding:8px 14px;border-radius:8px;background:var(--neon-soft);color:var(--neon-ink);border:1px solid var(--neon-border);white-space:nowrap}
+
+/* NÚMEROS */
+.nums{display:grid;grid-template-columns:repeat(2,1fr);gap:32px 24px}@media(min-width:1024px){.nums{grid-template-columns:repeat(4,1fr)}}
+.num b{display:block;font-size:40px;font-weight:600;letter-spacing:-.03em;line-height:1;color:#fff}@media(min-width:640px){.num b{font-size:48px}}.num b i{font-style:normal;font-size:20px;font-weight:500;color:var(--neon);margin-left:2px}
+.num p{font-size:13.5px;color:var(--on-dark-mid);margin-top:8px}
+
+/* SIMULADOR */
+.sim{display:grid;grid-template-columns:1fr;gap:24px}@media(min-width:1024px){.sim{grid-template-columns:1fr 1fr;gap:40px}}
+.sim-in{border-radius:var(--radius);padding:24px;background:var(--card);border:1px solid var(--border);display:flex;flex-direction:column;gap:20px}@media(min-width:640px){.sim-in{padding:28px}}
+.rng label{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;color:var(--mid)}.rng label b{color:var(--hi);font-weight:600}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:99px;outline:none;background:var(--border)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:99px;background:var(--ink);border:3px solid var(--neon);box-shadow:0 2px 10px rgba(17,19,24,.25);cursor:pointer;transition:transform .15s}input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.12)}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:99px;background:var(--ink);border:3px solid var(--neon);cursor:pointer}
+.sim-note{font-size:11.5px;color:var(--low);line-height:1.5}
+.sim-out{border-radius:var(--radius);padding:24px;background:var(--ink);display:flex;flex-direction:column;color:#fff}@media(min-width:640px){.sim-out{padding:28px}}
+.sim-out .g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.sim-out .lb{font-size:12.5px;color:var(--on-dark-mid)}.sim-out .v{font-size:30px;font-weight:600;letter-spacing:-.02em;margin-top:4px}@media(min-width:640px){.sim-out .v{font-size:34px}}
+.sim-out .big{font-size:38px;font-weight:600;letter-spacing:-.03em;line-height:1;color:var(--neon);margin-top:4px}@media(min-width:640px){.sim-out .big{font-size:46px}}.sim-out .big i{font-style:normal;font-size:15px;font-weight:500;color:var(--on-dark-mid);margin-left:4px}
+.sim-out hr{border:0;border-top:1px solid rgba(255,255,255,.08);margin:24px 0}
+.cmp{border-radius:12px;padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);margin-top:24px}.cmp span{color:var(--on-dark-mid);display:block}.cmp b{display:block;margin-top:2px}.cmp b.n{color:var(--neon)}
+.verdict{font-size:13px;color:var(--on-dark-hi);margin-top:16px;line-height:1.55}
+.sim-out .cta{margin-top:auto;padding-top:24px}
+
+/* PARA QUEM */
+.pq{display:grid;grid-template-columns:1fr;gap:16px}@media(min-width:768px){.pq{grid-template-columns:1fr 1fr}}
+.pq-box{border-radius:var(--radius);padding:24px;background:var(--card);border:1px solid var(--border)}.pq-box.yes{border-color:var(--neon-border)}
+.pq-box h3{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px;margin-bottom:16px}
+.pq-box ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;font-size:14.5px}.pq-box li{display:flex;gap:10px;align-items:flex-start}.pq-box li svg{flex-shrink:0;margin-top:3px}
+.pq-box.no ul{color:var(--mid)}
+
+/* PASSOS */
+.steps{display:grid;grid-template-columns:1fr;gap:40px}@media(min-width:1024px){.steps{grid-template-columns:1fr 1.4fr}}
+.steps ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.steps li{display:flex;gap:16px;border-radius:var(--radius);padding:20px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+.steps li i{width:32px;height:32px;border-radius:99px;display:grid;place-items:center;font-style:normal;font-size:13px;font-weight:700;background:var(--neon);color:var(--ink);flex-shrink:0}
+.steps li b{display:block;font-size:16px;font-weight:600;color:#fff}.steps li p{font-size:13.5px;color:var(--on-dark-mid);margin-top:4px;line-height:1.55}
+
+/* INCLUÍDO */
+.inc-hd{display:flex;flex-direction:column;gap:16px;margin-bottom:32px}@media(min-width:640px){.inc-hd{flex-direction:row;align-items:flex-end;justify-content:space-between}}
+.inc{display:grid;grid-template-columns:1fr;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}@media(min-width:640px){.inc{grid-template-columns:1fr 1fr}}@media(min-width:1024px){.inc{grid-template-columns:repeat(3,1fr)}}
+.inc div{padding:16px 20px;background:var(--card);display:flex;gap:12px;align-items:flex-start}.inc svg{flex-shrink:0;margin-top:4px;color:var(--neon-ink)}.inc b{display:block;font-size:14px;font-weight:600}.inc small{font-size:12.5px;color:var(--mid)}
+
+/* PREÇO */
+.planos{display:grid;grid-template-columns:1fr;gap:16px;max-width:900px;margin:40px auto 0}@media(min-width:768px){.planos{grid-template-columns:1fr 1fr}}
+.plano{position:relative;border-radius:var(--radius);padding:24px;overflow:hidden;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);transition:border-color .3s,box-shadow .3s,background .3s}@media(min-width:640px){.plano{padding:28px}}
+.plano.on{background:var(--ink-2);border-color:rgba(226,255,26,.55);box-shadow:0 24px 60px rgba(0,0,0,.35),0 0 0 1px rgba(226,255,26,.15) inset}
+.plano::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(260px circle at var(--mx,-999px) var(--my,-999px),rgba(226,255,26,.14),transparent 60%)}
+.plano .selo{position:absolute;top:16px;right:16px;font-size:10.5px;font-weight:700;padding:4px 10px;border-radius:99px;background:var(--neon);color:var(--ink)}
+.plano .nm{font-size:13px;font-weight:600;color:var(--on-dark-hi)}
+.plano .pr{display:flex;align-items:baseline;gap:6px;margin-top:12px}.plano .pr b{font-size:40px;font-weight:600;letter-spacing:-.03em;line-height:1;color:#fff}@media(min-width:640px){.plano .pr b{font-size:46px}}.plano .pr span{font-size:14px;color:var(--on-dark-mid)}
+.plano .sub{font-size:13px;margin-top:8px;min-height:20px;color:var(--on-dark-mid)}.plano.on .sub{color:var(--neon)}
+.plano .act{margin-top:24px;position:relative}.plano .nt{font-size:12px;color:var(--on-dark-low);margin-top:12px}
+.garant{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 24px;font-size:13px;color:var(--on-dark-mid);margin-top:24px}.garant span{display:flex;align-items:center;gap:6px}.garant svg{color:var(--neon)}
+.aviso{text-align:center;font-size:12.5px;color:var(--on-dark-low);margin-top:16px}
+
+/* FAQ */
+.faq{max-width:760px;margin:0 auto}.faq .list{margin-top:32px;display:flex;flex-direction:column;gap:8px}
+.q{border-radius:12px;overflow:hidden;background:var(--card);border:1px solid var(--border);transition:border-color .2s}.q.on{border-color:var(--neon-border)}
+.q button{width:100%;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 20px;text-align:left;font-size:15px;font-weight:600}
+.q button svg{flex-shrink:0;color:var(--low);transition:transform .25s}.q.on button svg{transform:rotate(180deg)}
+.q .a{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s ease}.q.on .a{grid-template-rows:1fr}.q .a>div{overflow:hidden}.q .a p{padding:0 20px 16px;font-size:14px;color:var(--mid);line-height:1.6}
+
+/* CTA + FOOTER + BARRA */
+.cta-final{text-align:center;max-width:640px;margin:0 auto}
+footer{background:var(--ink-3);border-top:1px solid rgba(255,255,255,.06);padding:32px 0}
+footer .wrap{display:flex;flex-direction:column;align-items:center;gap:16px;font-size:12px;color:#5C6577;text-align:center}@media(min-width:640px){footer .wrap{flex-direction:row;justify-content:space-between;text-align:right}}
+footer a.ent{font-weight:600;color:var(--on-dark-hi)}
+.bar{position:fixed;left:12px;right:12px;bottom:12px;z-index:40;border-radius:16px;padding:12px 16px;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(17,19,24,.94);border:1px solid rgba(255,255,255,.1);box-shadow:0 12px 34px rgba(0,0,0,.35);backdrop-filter:blur(10px);transform:translateY(120%);transition:transform .35s cubic-bezier(.16,1,.3,1)}
+.bar.on{transform:none}@media(min-width:768px){.bar{display:none}}
+.bar b{display:block;font-size:13px;font-weight:600;color:#fff}.bar b span{font-weight:400;color:var(--on-dark-mid)}.bar small{font-size:11px;color:var(--on-dark-mid)}
+
+
+/* ===== HERO refinado ===== */
+.hero h1{text-wrap:balance}
+.hero-glow2{position:absolute;left:50%;top:38%;width:1100px;height:600px;transform:translateX(-50%);border-radius:50%;pointer-events:none;background:radial-gradient(ellipse at center,rgba(226,255,26,.10),transparent 60%);filter:blur(20px)}
+.trust{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 20px;margin-top:22px;font-size:12.5px;color:var(--on-dark-mid)}
+.trust span{display:flex;align-items:center;gap:6px}.trust svg{color:var(--neon);flex-shrink:0}
+.frame-wrap{perspective:1600px}
+.frame-3d{transform-origin:50% 0;animation:tilt 1.1s cubic-bezier(.16,1,.3,1) .35s both}
+@keyframes tilt{from{opacity:0;transform:rotateX(14deg) translateY(30px)}to{opacity:1;transform:none}}
+.frame-shadow{position:absolute;left:8%;right:8%;bottom:-40px;height:120px;border-radius:50%;background:radial-gradient(ellipse at center,rgba(226,255,26,.18),transparent 70%);filter:blur(30px);pointer-events:none}
+
+/* ===== App shell (desktop) ===== */
+.mold.app{background:var(--bg);box-shadow:0 40px 100px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.06)}
+.mold.app .mold-bar{background:#16191F;border-color:rgba(255,255,255,.08)}.mold.app .mold-bar span{color:var(--on-dark-mid)}
+.mold.app .mold-bar .url{margin-left:auto;margin-right:auto;font-size:10.5px;color:var(--on-dark-low);background:rgba(255,255,255,.05);padding:3px 40px;border-radius:6px}
+.shell{display:grid;grid-template-columns:184px 1fr;min-height:420px}
+@media(max-width:640px){.shell{grid-template-columns:1fr}.shell .sb{display:none}.shell .kpis{grid-template-columns:repeat(2,1fr)!important}}
+.sb{background:var(--ink);padding:14px 10px;display:flex;flex-direction:column;gap:14px;border-right:1px solid rgba(255,255,255,.06)}
+.sb .lg{display:flex;align-items:center;gap:8px;padding:2px 6px}.sb .lg i{width:26px;height:26px;border-radius:8px;background:var(--neon);display:grid;place-items:center}.sb .lg b{font-size:12.5px;color:#fff;font-weight:700}
+.sb .grp{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#5C6577;padding:0 8px;margin-bottom:2px}
+.sb .it{display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:500;color:var(--on-dark-mid);padding:6px 8px;border-radius:7px;position:relative}
+.sb .it svg{width:13px;height:13px;color:var(--on-dark-mid)}
+.sb .it.hl{background:rgba(226,255,26,.06);border:1px solid rgba(226,255,26,.14);color:#F4F7D9}.sb .it.hl svg{color:var(--neon)}
+.sb .it.on{background:#181F2C;color:#fff}.sb .it.on::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:99px;background:var(--neon)}.sb .it.on svg{color:var(--neon)}
+.sb .it .bd{margin-left:auto;font-size:9px;font-weight:700;padding:1px 6px;border-radius:99px;background:var(--neon);color:var(--ink)}
+.main{display:flex;flex-direction:column;min-width:0}
+.top{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--card);border-bottom:1px solid var(--border)}
+.top .srch{flex:1;display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--low);padding:6px 10px;border-radius:8px;background:var(--bg);border:1px solid var(--border)}.top .srch kbd{margin-left:auto;font-family:var(--mono);font-size:9.5px;padding:1px 5px;border-radius:4px;border:1px solid var(--border);background:#fff;color:var(--low)}
+.top .ico{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;border:1px solid var(--border);color:var(--mid);position:relative}.top .ico i{position:absolute;top:5px;right:5px;width:6px;height:6px;border-radius:99px;background:var(--error)}
+.top .av{width:28px;height:28px;border-radius:99px;background:var(--ink);color:var(--neon);font-size:10px;font-weight:700;display:grid;place-items:center}
+.cont{padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.hdr{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}.hdr b{display:block;font-size:16px;font-weight:600;letter-spacing:-.01em}.hdr small{font-size:11px;color:var(--low)}
+.hdr .nb{font-size:11px;font-weight:600;padding:6px 10px;border-radius:8px;background:var(--neon);color:var(--ink);white-space:nowrap}
+.att{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}@media(max-width:640px){.att{grid-template-columns:1fr}}
+.att div{border-radius:10px;padding:10px 12px;border:1px solid var(--border);background:var(--card);display:flex;gap:8px;align-items:flex-start}
+.att div.u{border-color:rgba(185,28,28,.35);background:#FFF7F7}.att div.w{border-color:rgba(180,83,9,.35);background:#FFFBF3}
+.att b{display:block;font-size:11.5px;font-weight:600}.att small{font-size:10.5px;color:var(--mid)}
+.att i{width:8px;height:8px;border-radius:99px;margin-top:5px;flex-shrink:0}
+.two{display:grid;grid-template-columns:1.3fr 1fr;gap:10px}@media(max-width:640px){.two{grid-template-columns:1fr}}
+.pnl{border-radius:12px;border:1px solid var(--border);background:var(--card);padding:12px}
+.pnl h5{margin:0 0 8px;font-size:11.5px;font-weight:600;display:flex;justify-content:space-between}.pnl h5 span{font-weight:500;color:var(--low);font-size:10.5px}
+.bars{display:flex;align-items:flex-end;gap:6px;height:74px}.bars div{flex:1;height:100%;border-radius:4px 4px 2px 2px;background:#E9EBEE;position:relative}.bars div i{position:absolute;left:0;right:0;bottom:0;border-radius:4px 4px 2px 2px;background:var(--ink)}.bars div.p i{background:var(--neon)}
+.bars-l{display:flex;justify-content:space-between;font-size:9px;color:var(--low);margin-top:4px}
+.ag{display:flex;flex-direction:column;gap:6px}.ag div{display:flex;gap:8px;align-items:center;font-size:11px}.ag div b{font-family:var(--mono);font-weight:500;font-size:10px;color:var(--mid);width:38px}.ag div i{width:3px;height:22px;border-radius:99px}.ag div span{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+
+/* ===== Celular nativo ===== */
+.phone{width:320px;padding:9px;border-radius:44px;background:linear-gradient(160deg,#2A2F37,#111318 40%,#0C0E12);box-shadow:0 50px 100px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.10) inset,0 0 0 2px #0C0E12,-3px 0 0 3px #1A1E25,3px 0 0 3px #1A1E25;position:relative}
+.phone::before{content:"";position:absolute;left:50%;top:14px;transform:translateX(-50%);width:96px;height:26px;border-radius:99px;background:#0C0E12;z-index:3}
+.phone-in{border-radius:36px;background:var(--bg);position:relative;overflow:hidden}
+.phone-top{display:flex;align-items:center;justify-content:space-between;padding:14px 22px 4px;font-size:12px;font-weight:600;color:var(--hi)}
+.phone-top b{display:none}.phone-top .st{display:flex;gap:4px;align-items:center}.phone-top .st i{display:block;width:14px;height:8px;border-radius:2px;border:1.5px solid var(--hi);position:relative}.phone-top .st i::after{content:"";position:absolute;left:1px;top:1px;bottom:1px;width:8px;background:var(--hi);border-radius:1px}
+.phone-title{display:none}
+.phone-body{padding:0;max-height:none}
+.m-hd{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 4px}
+.m-hd .lg{display:flex;align-items:center;gap:8px}.m-hd .lg i{width:28px;height:28px;border-radius:8px;background:var(--neon);display:grid;place-items:center}.m-hd .lg b{font-size:13px;font-weight:700}.m-hd .lg small{display:block;font-size:10px;color:var(--low);line-height:1}
+.m-hd .r{display:flex;gap:8px}.m-hd .r i{width:30px;height:30px;border-radius:99px;display:grid;place-items:center;border:1px solid var(--border);background:var(--card);color:var(--mid);position:relative}.m-hd .r i b{position:absolute;top:6px;right:7px;width:6px;height:6px;border-radius:99px;background:var(--error)}
+.m-hd .r i.av{background:var(--ink);color:var(--neon);font-size:10px;font-weight:700;border-color:var(--ink)}
+.m-body{padding:8px 14px 78px;display:flex;flex-direction:column;gap:10px}
+.m-greet b{display:block;font-size:17px;font-weight:600;letter-spacing:-.01em}.m-greet small{font-size:11.5px;color:var(--low)}
+.m-ross{border-radius:14px;padding:12px;background:var(--ink);display:flex;flex-direction:column;gap:10px}
+.m-ross .id{display:flex;align-items:center;gap:10px}
+.m-ross .chips{display:flex;gap:6px;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,#000 80%,transparent);mask-image:linear-gradient(90deg,#000 80%,transparent)}.m-ross .chips span{flex-shrink:0}
+.m-sec{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--mid);display:flex;justify-content:space-between;align-items:center;margin-top:2px}.m-sec span{font-weight:500;text-transform:none;letter-spacing:0;color:var(--neon-ink);font-size:11px}
+.m-att{display:flex;flex-direction:column;gap:6px}
+.m-att div{border-radius:12px;padding:10px 12px;display:flex;gap:10px;align-items:center;background:var(--card);border:1px solid var(--border)}
+.m-att div.u{border-color:rgba(185,28,28,.35);background:#FFF7F7}.m-att div.w{border-color:rgba(180,83,9,.35);background:#FFFBF3}
+.m-att i{width:8px;height:8px;border-radius:99px;flex-shrink:0}.m-att>div>span{flex:1;min-width:0}.m-att b{display:block;font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.m-att small{display:block;font-size:11px;color:var(--mid);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.m-att em{margin-left:auto;font-style:normal;font-size:10px;font-weight:700;padding:3px 7px;border-radius:99px;white-space:nowrap}
+.m-kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.m-kpis div{border-radius:12px;padding:12px;background:var(--card);border:1px solid var(--border)}.m-kpis div.a{border-color:var(--neon-border)}
+.m-kpis b{display:block;font-size:20px;font-weight:600;letter-spacing:-.02em;line-height:1;white-space:nowrap}.m-kpis b.money{font-size:15px}.m-kpis small{display:block;font-size:11px;font-weight:500;margin-top:4px}.m-kpis em{display:block;font-style:normal;font-size:10px;color:var(--low)}
+.m-ag{border-radius:12px;background:var(--card);border:1px solid var(--border);padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.m-ag div{display:flex;gap:10px;align-items:center;font-size:12px}.m-ag b{font-family:var(--mono);font-weight:500;font-size:10.5px;color:var(--mid);width:40px}.m-ag i{width:3px;height:24px;border-radius:99px}.m-ag span{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.m-tab{position:absolute;left:0;right:0;bottom:0;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(5,1fr);padding:8px 8px 18px}
+.m-tab div{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9.5px;font-weight:500;color:var(--low)}.m-tab div.on{color:var(--hi)}
+.m-tab div.c{margin-top:-22px}.m-tab div.c i{width:44px;height:44px;border-radius:99px;background:var(--neon);display:grid;place-items:center;box-shadow:0 8px 20px rgba(199,214,0,.4)}
+.m-tab svg{width:20px;height:20px}
+.m-home{position:absolute;left:50%;bottom:6px;transform:translateX(-50%);width:110px;height:4px;border-radius:99px;background:var(--ink);opacity:.8}
+.phone-glow{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(226,255,26,.16),transparent 60%);filter:blur(10px);pointer-events:none;z-index:0}
+.phone{z-index:1}
+#dev-celular{position:relative;padding:20px 0 10px}
+
+
+/* ===== Dia com / sem ===== */
+.dia-hd{display:flex;flex-direction:column;gap:20px;margin-bottom:28px}@media(min-width:768px){.dia-hd{flex-direction:row;align-items:flex-end;justify-content:space-between}}
+.seg.light{background:#ECEDEF;border-color:var(--border)}.seg.light button{color:var(--mid)}.seg.light button.on{background:var(--ink);color:var(--neon)}
+.dia{border-radius:var(--radius);padding:24px;background:var(--card);border:1px solid var(--border)}@media(min-width:640px){.dia{padding:28px}}
+.dia-bar{display:flex;height:64px;border-radius:12px;overflow:hidden;gap:3px}
+.dia-bar div{height:100%;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;transition:width .9s cubic-bezier(.16,1,.3,1),background .3s;min-width:0}
+.dia-axis{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;color:var(--low);margin-top:8px}
+.dia-leg{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 20px;margin-top:22px}@media(min-width:768px){.dia-leg{grid-template-columns:repeat(5,1fr)}}
+.dia-leg div{display:flex;gap:10px;align-items:flex-start}.dia-leg i{width:10px;height:10px;border-radius:3px;margin-top:5px;flex-shrink:0}
+.dia-leg b{display:block;font-size:18px;font-weight:600;letter-spacing:-.01em;font-variant-numeric:tabular-nums}.dia-leg small{font-size:12px;color:var(--mid)}
+.dia-leg div.hl b{color:var(--neon-ink)}
+.dia-sum{margin-top:22px;padding-top:20px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:14px}@media(min-width:768px){.dia-sum{flex-direction:row;align-items:center;justify-content:space-between}}
+.dia-sum p{font-size:16px;font-weight:500;max-width:640px}@media(min-width:640px){.dia-sum p{font-size:18px}}.dia-sum p b{background:var(--neon);padding:0 6px;border-radius:5px}
+.dia-note{font-size:11.5px;color:var(--low);margin-top:12px}
+
+/* ===== Para quem (3 perfis) ===== */
+.perfis{display:grid;grid-template-columns:1fr;gap:16px}@media(min-width:900px){.perfis{grid-template-columns:repeat(3,1fr)}}
+.perfil{position:relative;border-radius:var(--radius);padding:26px;background:var(--card);border:1px solid var(--border);display:flex;flex-direction:column;transition:transform .3s cubic-bezier(.16,1,.3,1),box-shadow .3s,border-color .3s;overflow:hidden}
+.perfil:hover{transform:translateY(-4px);box-shadow:0 20px 50px rgba(17,19,24,.10);border-color:var(--neon-border)}
+.perfil::after{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:var(--neon);transform:scaleX(0);transform-origin:left;transition:transform .4s}.perfil:hover::after{transform:scaleX(1)}
+.perfil .ic{width:40px;height:40px;border-radius:12px;background:var(--ink);color:var(--neon);display:grid;place-items:center}
+.perfil .tg{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--low);margin-top:18px}
+.perfil h3{font-size:20px;font-weight:600;margin-top:6px}
+.perfil p{font-size:14px;color:var(--mid);margin-top:10px;line-height:1.6}
+.perfil ul{list-style:none;margin:18px 0 0;padding:16px 0 0;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:9px;font-size:13.5px}
+.perfil li{display:flex;gap:9px;align-items:flex-start}.perfil li svg{flex-shrink:0;margin-top:3px;color:var(--neon-ink)}
+.perfil .gn{margin-top:auto;padding-top:18px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}.perfil .gn span{padding:6px 10px;border-radius:8px;background:var(--neon-soft);border:1px solid var(--neon-border);color:var(--neon-ink)}
+.areas{margin-top:20px;border-radius:14px;padding:16px 20px;background:var(--ink);color:#fff;display:flex;flex-direction:column;gap:12px}@media(min-width:768px){.areas{flex-direction:row;align-items:center;justify-content:space-between}}
+.areas p{font-size:14px;color:var(--on-dark-hi)}.areas p b{color:#fff}
+.honesto{margin-top:14px;font-size:13px;color:var(--mid);text-align:center}
+
+
+/* ===== Oferta / value stack ===== */
+.of-hd{max-width:760px;margin-bottom:36px}
+.of{display:grid;grid-template-columns:1fr;gap:20px;align-items:start}@media(min-width:1024px){.of{grid-template-columns:1.35fr 1fr;gap:28px}}
+.rc{border-radius:var(--radius);background:var(--card);border:1px solid var(--border);overflow:hidden}
+.rc-top{display:flex;justify-content:space-between;align-items:center;padding:14px 22px;background:#FAFAFA;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--low)}
+.rc-row{display:grid;grid-template-columns:36px 1fr auto;gap:14px;align-items:center;padding:14px 22px;border-bottom:1px dashed var(--border);opacity:0;transform:translateX(-10px);transition:opacity .45s ease,transform .45s cubic-bezier(.16,1,.3,1)}
+.rc.on .rc-row{opacity:1;transform:none}
+.rc-row .i{width:36px;height:36px;border-radius:10px;background:var(--bg);border:1px solid var(--border);display:grid;place-items:center;color:var(--hi)}
+.rc-row b{display:block;font-size:14.5px;font-weight:600}.rc-row small{display:block;font-size:12.5px;color:var(--mid);margin-top:1px}
+.rc-row .v{font-family:var(--mono);font-size:14px;font-weight:500;white-space:nowrap;color:var(--hi)}.rc-row .v span{font-family:var(--font);font-size:11px;color:var(--low)}
+.rc-sum{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;background:#FAFAFA}
+.rc-sum span{font-size:13px;font-weight:600;color:var(--mid)}.rc-sum b{font-family:var(--mono);font-size:22px;font-weight:500;color:var(--hi)}
+.rc-note{padding:12px 22px 16px;font-size:11.5px;color:var(--low);line-height:1.5;background:#FAFAFA}
+.tk{position:sticky;top:88px;border-radius:var(--radius);background:var(--ink);color:#fff;padding:26px;box-shadow:0 30px 70px rgba(17,19,24,.25);overflow:hidden}
+.tk::before{content:"";position:absolute;right:-120px;top:-120px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(226,255,26,.16),transparent 65%);pointer-events:none}
+.tk .ln{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.08);position:relative}
+.tk .ln span{font-size:13px;color:var(--on-dark-mid)}.tk .ln small{display:block;font-size:11px;color:var(--on-dark-low);margin-top:2px}
+.tk .ln b{font-family:var(--mono);font-size:17px;font-weight:500;color:var(--on-dark-hi);white-space:nowrap}
+.strike{position:relative;display:inline-block}.strike::after{content:"";position:absolute;left:-3px;right:-3px;top:52%;height:2px;border-radius:2px;background:#F04438;transform:scaleX(0);transform-origin:left;transition:transform .5s cubic-bezier(.16,1,.3,1)}
+.tk.done .strike.s1::after{transform:scaleX(1)}.tk.done .strike.s2::after{transform:scaleX(1);transition-delay:.45s}
+.tk .lanc{margin-top:18px;opacity:0;transform:translateY(10px) scale(.98);transition:opacity .6s ease .9s,transform .6s cubic-bezier(.16,1,.3,1) .9s}
+.tk.done .lanc{opacity:1;transform:none}
+.tk .tag{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:5px 10px;border-radius:99px;background:var(--neon);color:var(--ink)}
+.tk .pz{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;margin-top:12px}.tk .pz b{white-space:nowrap}.tk .pz b{font-size:40px;font-weight:600;letter-spacing:-.03em;line-height:1;color:#fff}.tk .pz span{font-size:14px;color:var(--on-dark-mid)}
+.tk .alt{font-size:13px;color:var(--on-dark-hi);margin-top:6px}.tk .alt b{color:var(--neon);font-weight:600}
+.tk .eco{margin-top:18px;border-radius:12px;padding:14px;background:rgba(226,255,26,.08);border:1px solid rgba(226,255,26,.25);display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tk .eco span{display:block;font-size:11.5px;color:var(--on-dark-mid)}.tk .eco b{display:block;font-size:18px;font-weight:600;color:var(--neon);margin-top:2px;font-variant-numeric:tabular-nums}
+.tk .cta{margin-top:18px;display:flex;flex-direction:column;gap:8px}
+.tk .fine{font-size:11.5px;color:var(--on-dark-low);line-height:1.5;margin-top:12px}
+
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.rev{opacity:1;transform:none}.rc-row{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a href="#inicio" class="logo" aria-label="JurisClik">
+      <span class="logo-mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 4v10.5a4.5 4.5 0 0 1-7 3.7" stroke="#111318" stroke-width="2.6" stroke-linecap="round"/><path d="M13.5 12.5 21 20" stroke="#111318" stroke-width="2.6" stroke-linecap="round"/><path d="M13.5 4.5l1.2 3 3-1.2-1.2 3 3 1.2-3 1.2" stroke="#111318" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <span><span class="logo-text">JurisClik</span><br><span class="logo-sub">copiloto jurídico</span></span>
+    </a>
+    <nav class="nav-links" aria-label="Seções">
+      <a href="#tour" data-spy="tour">Produto</a>
+      <a href="#paraquem" data-spy="paraquem">Para quem</a>
+      <a href="#contas" data-spy="contas">Faça as contas</a>
+      <a href="#precos" data-spy="precos">Preço</a>
+      <a href="#faq" data-spy="faq">Dúvidas</a>
+    </nav>
+    <div style="display:flex;gap:8px;align-items:center">
+      <a class="btn btn-sm btn-ghost-dark" data-app href="#" style="border-color:transparent">Entrar</a>
+      <a class="btn btn-sm btn-neon" data-app href="#">Testar grátis</a>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero" id="inicio">
+  <div class="hero-grid"></div><div class="hero-glow"></div><div class="hero-glow2"></div>
+  <div class="wrap">
+    <div class="hero-inner stage">
+      <div class="pill"><i class="dot"></i>Do advogado autônomo ao escritório que já fatura</div>
+      <h1>Peças, jurisprudência, prazos e cálculos. Uma ferramenta.</h1>
+      <p class="lead">O JurisClik redige a minuta a partir do seu relato, pesquisa jurisprudência com link do tribunal, aponta o que exige ação no processo e calcula as verbas com memória. Você revisa, protocola e usa o tempo que sobra para atender e faturar mais.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-neon" data-app href="#">Testar grátis, sem cartão</a>
+        <a class="btn btn-ghost-dark" href="#tour">Ver o produto <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></a>
+      </div>
+      <div class="trust">
+        <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Sem cartão para testar</span>
+        <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>1 uso grátis em cada ferramenta</span>
+        <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Depois, <span data-preco="mensalEquivalente" style="color:#fff;font-weight:600"></span>/mês no anual</span>
+      </div>
+    </div>
+
+    <div class="frame-wrap">
+      <div style="display:flex;justify-content:center;margin-bottom:20px">
+        <div class="seg" role="group" aria-label="Ver a demonstração em">
+          <button class="on" data-dev="computador">Computador</button>
+          <button data-dev="celular">Celular</button>
+        </div>
+      </div>
+      <div id="dev-computador" class="frame-3d" style="position:relative">
+        <div class="frame-shadow"></div>
+        <div class="mold app"><div class="mold-bar"><i style="background:#FF5F57"></i><i style="background:#FEBC2E"></i><i style="background:#28C840"></i><span class="url">app.jurisclik.com.br</span></div>
+          <div id="demo-dash"></div></div>
+      </div>
+      <div id="dev-celular" hidden>
+        <div class="phone-glow"></div>
+        <div class="phone"><div class="phone-in"><div class="phone-top"><span>9:41</span><span class="st"><svg width="14" height="10" viewBox="0 0 14 10" fill="#172033"><rect x="0" y="6" width="2.5" height="4" rx=".5"/><rect x="3.8" y="4" width="2.5" height="6" rx=".5"/><rect x="7.6" y="2" width="2.5" height="8" rx=".5"/><rect x="11.4" y="0" width="2.5" height="10" rx=".5"/></svg><i></i></span></div><div class="phone-body" id="demo-dash-m"></div><div class="m-home"></div></div></div>
+      </div>
+      <div class="hero-note" style="text-align:center;margin-top:20px;font-size:12.5px">Os mesmos componentes do produto, não uma imagem. Funciona no celular.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FAIXA -->
+<div class="marquee" aria-hidden="true"><div class="track" id="track"></div></div>
+
+<!-- PARA ONDE VAI O SEU DIA -->
+<section class="rev" id="dia" style="padding:64px 0 48px">
+  <div class="wrap">
+    <div class="dia-hd">
+      <div style="max-width:640px"><h2>Para onde vai o seu dia?</h2><p class="lead" style="margin-top:12px">A maior parte do expediente vai para trabalho que não é faturado: redigir do zero, abrir abas atrás de ementa, conferir andamento. Veja o mesmo dia, lado a lado.</p></div>
+      <div class="seg light" role="group" aria-label="Comparar o dia"><button class="on" data-dia="sem">Sem JurisClik</button><button data-dia="com">Com JurisClik</button></div>
+    </div>
+    <div class="dia">
+      <div class="dia-bar" id="dia-bar"></div>
+      <div class="dia-axis"><span>09h</span><span>12h</span><span>15h</span><span>18h</span></div>
+      <div class="dia-leg" id="dia-leg"></div>
+      <div class="dia-sum"><p id="dia-txt"></p><a class="btn btn-neon" data-app href="#">Recuperar o meu dia</a></div>
+    </div>
+    <p class="dia-note">Dia ilustrativo com duas peças, quatro pesquisas e uma rodada de andamentos, usando as mesmas premissas do simulador abaixo. O seu dia pode ser diferente — faça as suas contas.</p>
+  </div>
+</section>
+
+<!-- TOUR -->
+<section class="rev" id="tour" style="padding-top:16px">
+  <div class="wrap">
+    <div style="max-width:760px;margin-bottom:40px"><h2>O produto, tela por tela.</h2><p class="lead" style="margin-top:12px">São as mesmas telas que você vai abrir ao clicar em Testar grátis. Nada aqui é maquete.</p></div>
+    <div class="tour">
+      <div class="tabs" role="tablist" id="tabs"></div>
+      <div id="panels"></div>
+    </div>
+  </div>
+</section>
+
+<!-- NÚMEROS -->
+<section class="dark rev" style="padding:56px 0">
+  <div class="wrap">
+    <div class="nums">
+      <div class="num"><b><span data-count="19">0</span></b><p>tipos de peça, do trabalhista ao criminal</p></div>
+      <div class="num"><b><span data-count="3">0</span></b><p>regimes de prazo: CPC, CLT e dias corridos</p></div>
+      <div class="num"><b><span data-count="15">0</span><i>+</i></b><p>recursos incluídos em um único plano</p></div>
+      <div class="num"><b><span data-count="5">0</span></b><p>ferramentas com 1 uso grátis, com o seu caso</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PARA QUEM -->
+<section class="rev" id="paraquem">
+  <div class="wrap">
+    <div style="max-width:760px;margin-bottom:36px"><h2>Feito para quem advoga todos os dias.</h2><p class="lead" style="margin-top:12px">Sozinho, com uma pequena equipe ou num escritório que já fatura bem: o gargalo é o mesmo — horas demais em trabalho que não é cobrado.</p></div>
+    <div class="perfis">
+      <div class="perfil"><span class="ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><div class="tg">Advogado autônomo</div><h3>Você é o escritório inteiro.</h3><p>Atende, redige, pesquisa, controla prazo e cobra. O JurisClik assume a parte repetitiva, como um assistente que já sabe o caso.</p><ul><li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Primeira versão da peça em minutos</li><li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Prazos e agenda sem planilha</li><li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Honorários a receber sob controle</li></ul><div class="gn"><span>Mais tempo para atender e captar</span></div></div>
+      <div class="perfil"><span class="ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><div class="tg">Pequeno escritório</div><h3>Muita demanda, pouca gente.</h3><p>Mais peças saindo com a mesma equipe e o mesmo padrão de qualidade, sem contratar mais uma pessoa para dar conta.</p><ul><li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Teses reaproveitadas na biblioteca</li><li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Revisão aponta lacunas antes do protocolo</li><li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Processos, documentos e clientes no mesmo lugar</li></ul><div class="gn"><span>Mais produção, mesma folha</span></div></div>
+      <div class="perfil"><span class="ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg></span><div class="tg">Escritório que já fatura</div><h3>Crescer sem aumentar o custo fixo.</h3><p>Cada hora poupada na produção vira capacidade para novos casos e novos contratos, com a mesma estrutura de hoje.</p><ul><li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Capacidade para mais casos por mês</li><li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Financeiro: a receber, recebido e em atraso</li><li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Cálculos com memória prontos para anexar</li></ul><div class="gn"><span>Mais casos com a mesma estrutura</span></div></div>
+    </div>
+    <div class="areas"><p><b>Não é só para uma área.</b> São 19 tipos de peça, do trabalhista ao criminal, e o Ross e a jurisprudência atendem qualquer matéria.</p><a class="btn btn-neon btn-sm" data-app href="#">Testar na minha área</a></div>
+    <p class="honesto">O JurisClik não protocola por você e não substitui a sua revisão. Ele tira do caminho o trabalho repetitivo para você decidir, atender e cobrar.</p>
+  </div>
+</section>
+
+<!-- SIMULADOR -->
+<section class="rev" id="contas">
+  <div class="wrap">
+    <div style="max-width:760px;margin-bottom:40px"><h2>Quantas horas você recupera por mês?</h2><p class="lead" style="margin-top:12px">Coloque a sua rotina nos controles. A conta é feita com os seus números, não com os nossos.</p></div>
+    <div class="sim">
+      <div class="sim-in">
+        <div class="rng"><label>Peças que você redige por semana <b id="v-pecas"></b></label><input type="range" id="i-pecas" min="1" max="30" value="6"></div>
+        <div class="rng"><label>Horas gastas por peça hoje <b id="v-hp"></b></label><input type="range" id="i-hp" min="0.5" max="8" step="0.5" value="2"></div>
+        <div class="rng"><label>Pesquisas de jurisprudência por semana <b id="v-pesq"></b></label><input type="range" id="i-pesq" min="0" max="30" value="4"></div>
+        <div class="rng"><label>Valor da sua hora <b id="v-hora"></b></label><input type="range" id="i-hora" min="80" max="1000" step="10" value="250"></div>
+        <div class="rng"><label>O que você paga hoje em ferramentas <b id="v-fer"></b></label><input type="range" id="i-fer" min="0" max="1500" step="10" value="300"></div>
+        <p class="sim-note">Premissas da conta: a primeira versão da peça passa a tomar cerca de 30% do tempo atual (você ainda revisa); cada pesquisa com link da fonte poupa cerca de 20 minutos de busca em abas. Mês de 4,3 semanas. Simulação ilustrativa — o resultado depende da sua rotina.</p>
+      </div>
+      <div class="sim-out">
+        <div class="g2">
+          <div><div class="lb">Horas recuperadas por semana</div><div class="v tabular" id="o-sem"></div></div>
+          <div><div class="lb">Por mês</div><div class="v tabular" id="o-mes"></div></div>
+        </div>
+        <hr>
+        <div class="lb">Essas horas, cobradas ao seu valor</div>
+        <div class="big tabular"><span id="o-val"></span><i>/mês</i></div>
+        <div class="cmp">
+          <div><span>Ferramentas hoje</span><b class="tabular" id="o-fer"></b></div>
+          <div><span>JurisClik anual</span><b class="n tabular"><span data-preco="mensalEquivalente"></span>/mês</b></div>
+        </div>
+        <p class="verdict" id="o-verd"></p>
+        <div class="cta"><a class="btn btn-neon btn-full" data-app href="#">Testar com um caso real</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PASSOS -->
+<section class="dark rev" style="padding:64px 0">
+  <div class="wrap">
+    <div class="steps">
+      <div><h2>Três passos. Sem aprender IA.</h2><p class="lead" style="margin-top:12px">Você escreve como fala com um colega. O resto o JurisClik pergunta.</p><div style="margin-top:28px"><a class="btn btn-neon" data-app href="#">Começar pelo passo 1</a></div></div>
+      <ol>
+        <li><i>1</i><div><b>Conte o caso</b><p>Descreva o que precisa, anexe documentos e confirme os fatos que o JurisClik identificou.</p></div></li>
+        <li><i>2</i><div><b>Revise a minuta</b><p>A peça abre no editor, seção por seção, com jurisprudência linkada e o Ross ao lado.</p></div></li>
+        <li><i>3</i><div><b>Protocole com segurança</b><p>Baixe em Word ou PDF. Prazos e tarefas do caso já estão na agenda.</p></div></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- OFERTA -->
+<section class="rev" id="incluso">
+  <div class="wrap">
+    <div class="of-hd"><h2>Quanto isso custaria em ferramentas separadas?</h2><p class="lead" style="margin-top:12px">Cada função do JurisClik substitui uma ferramenta que você pagaria à parte. Somamos com valores de referência conservadores — e mostramos o que você paga aqui.</p></div>
+    <div class="of">
+      <div class="rc" id="rc">
+        <div class="rc-top"><span>O que está incluído</span><span>Valor avulso / mês</span></div>
+        <div id="rc-rows"></div>
+        <div class="rc-sum"><span>Total se contratado separado</span><b class="tabular" id="rc-tot">R$ 0</b></div>
+        <p class="rc-note">Valores de referência: estimativa conservadora do que uma ferramenta avulsa equivalente costuma custar por mês no mercado. Não são preços de concorrentes específicos.</p>
+      </div>
+      <aside class="tk" id="tk">
+        <div class="ln"><div><span>Contratando separado</span><small>soma das ferramentas ao lado</small></div><b class="strike s1 tabular" id="tk-sep"></b></div>
+        <div class="ln"><div><span>Valor justo do pacote</span><small>tudo integrado, num só lugar</small></div><b class="strike s2 tabular" id="tk-justo"></b></div>
+        <div class="lanc">
+          <span class="tag"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>Preço de lançamento</span>
+          <div class="pz"><b class="tabular" data-preco="mensalEquivalente"></b><span>/mês no plano anual</span></div>
+          <div class="alt">ou <b data-preco="mensal"></b>/mês no mensal</div>
+          <div class="eco">
+            <div><span>Economia por ano vs. separado</span><b id="tk-eco1"></b></div>
+            <div><span>Abaixo do valor justo</span><b id="tk-eco2"></b></div>
+          </div>
+          <div class="cta"><a class="btn btn-neon btn-full" href="#precos">Garantir o preço de lançamento</a><a class="btn btn-ghost-dark btn-full" data-app href="#">Testar grátis primeiro</a></div>
+          <p class="fine">Quem assina no lançamento mantém este valor enquanto a assinatura estiver ativa.</p>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- PREÇO -->
+<section class="dark rev" id="precos">
+  <div class="wrap">
+    <div style="max-width:760px;margin:0 auto;text-align:center">
+      <h2>Menos que uma hora de honorários por mês.</h2>
+      <p class="lead" style="margin-top:12px">Hoje isso costuma ser uma assinatura de IA, uma de jurisprudência, um sistema de gestão, uma agenda e uma planilha. Aqui é um valor só, com acesso completo e ilimitado.</p>
+      <div class="seg" style="margin-top:32px" role="group" aria-label="Ciclo de cobrança">
+        <button data-ciclo="mensal">Mensal</button>
+        <button class="on" data-ciclo="anual">Anual — economize <span data-preco="economia"></span></button>
+      </div>
+    </div>
+    <div class="planos">
+      <div class="plano" data-plano="mensal">
+        <div class="nm">Mensal</div>
+        <div class="pr"><b class="tabular" data-preco="mensal"></b><span>/mês</span></div>
+        <div class="sub">Cobrado mês a mês. Cancele quando quiser.</div>
+        <div class="act"><a class="btn btn-full btn-ghost-dark" data-assinar="mensal" href="#">Assinar o plano mensal</a></div>
+        <div class="nt">12 meses no mensal: <span data-preco="totalMensal12"></span></div>
+      </div>
+      <div class="plano on" data-plano="anual">
+        <span class="selo">ECONOMIZE <span data-preco="economia"></span></span>
+        <div class="nm">Anual</div>
+        <div class="pr"><b class="tabular" data-preco="mensalEquivalente"></b><span>/mês</span></div>
+        <div class="sub">Pago uma vez: <span data-preco="anual"></span> pelo ano inteiro.</div>
+        <div class="act"><a class="btn btn-full btn-neon" data-assinar="anual" href="#">Assinar o plano anual</a></div>
+        <div class="nt">O período pago continua válido até o fim do ano contratado.</div>
+      </div>
+    </div>
+    <div class="garant">
+      <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Acesso completo nos dois planos</span>
+      <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Todas as atualizações incluídas</span>
+      <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Comece grátis, sem cartão</span>
+    </div>
+    <p class="aviso" id="aviso-checkout" hidden>A assinatura ainda não está aberta. O botão libera o acesso de teste — é o mesmo produto.</p>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="rev" id="faq">
+  <div class="wrap">
+    <div class="faq"><h2>Antes de assinar, advogados perguntam:</h2><div class="list" id="faq-list"></div></div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="dark rev" style="padding:80px 0">
+  <div class="wrap">
+    <div class="cta-final">
+      <h2>Teste com um caso real. Hoje.</h2>
+      <p class="lead" style="margin-top:16px">Gere uma peça, pesquise uma jurisprudência, rode um cálculo. Se devolver horas à sua semana — e essas horas virarem atendimento e honorário —, você já sabe a resposta.</p>
+      <div class="hero-ctas"><a class="btn btn-neon" data-app href="#">Testar grátis, sem cartão</a><a class="btn btn-ghost-dark" href="#precos">Ver preço</a></div>
+      <div class="hero-note"><span data-preco="mensal"></span>/mês ou <span data-preco="anual"></span>/ano (<span data-preco="mensalEquivalente"></span>/mês)</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <a href="#inicio" class="logo" aria-label="JurisClik"><span class="logo-mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 4v10.5a4.5 4.5 0 0 1-7 3.7" stroke="#111318" stroke-width="2.6" stroke-linecap="round"/><path d="M13.5 12.5 21 20" stroke="#111318" stroke-width="2.6" stroke-linecap="round"/><path d="M13.5 4.5l1.2 3 3-1.2-1.2 3 3 1.2-3 1.2" stroke="#111318" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span><span class="logo-text">JurisClik</span></span></a>
+    <div style="max-width:520px">JurisClik é um copiloto jurídico. Não substitui a análise profissional: revise toda minuta e confira cada citação na fonte antes do protocolo.</div>
+    <a class="ent" data-app href="#">Entrar no JurisClik</a>
+  </div>
+</footer>
+
+<!-- BARRA MOBILE -->
+<div class="bar" id="bar" aria-hidden="true">
+  <div style="min-width:0"><b class="tabular"><span id="bar-preco"></span><span>/mês</span></b><small>1 uso grátis por ferramenta</small></div>
+  <a class="btn btn-sm btn-neon" data-app href="#">Testar grátis</a>
+</div>
+
+<script>
+/* ============ CONFIGURAÇÃO (edite aqui) ============ */
+const APP_URL = "https://app.jurisclik.com.br";                                   // link do app / criar conta
+const CHECKOUT_URLS = { mensal: "", anual: "" };       // links de pagamento (Stripe, Asaas, Hotmart, Kiwify…). Vazio = botão vira "Testar grátis agora".
+const PRECOS = { mensal: 129.9, anual: 997, mensalEquivalente: 83.08, economia: 561.8, totalMensal12: 1558.8 };
+
+const brl = v => "R$ " + Number(v).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
+const reduz = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $ = (s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+
+/* preços e links */
+$$("[data-preco]").forEach(el=>el.textContent=brl(PRECOS[el.dataset.preco]));
+$$("[data-app]").forEach(a=>a.href=APP_URL);
+const temCheckout = !!(CHECKOUT_URLS.mensal||CHECKOUT_URLS.anual);
+$$("[data-assinar]").forEach(a=>{ const u=CHECKOUT_URLS[a.dataset.assinar]; if(u){a.href=u;a.target="_blank";a.rel="noopener";} else {a.href=APP_URL;a.textContent="Testar grátis agora";} });
+if(!temCheckout) $("#aviso-checkout").hidden=false;
+
+/* ---------- DEMOS (HTML dos mesmos componentes do produto) ---------- */
+const svgCheck='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>';
+const demoDash = `
+<div class="d-col">
+  <div class="ross-bar"><div class="ross-id"><div class="ross-av">R</div><div><div class="ross-k">Ross</div><div class="ross-q">Em que posso ajudar?</div></div></div>
+    <div class="chips">${["Tirar uma dúvida","Criar uma peça","Jurisprudência","Analisar um caso","Resposta ao cliente","Revisar texto"].map(a=>`<span>${a}</span>`).join("")}</div></div>
+  <div class="kpis">${[["Prazos próximos","3","até 7 dias",1],["Audiências","1","nesta semana",0],["Processos ativos","12","15 no total",0],["Honorários a receber","R$ 18.400","R$ 2.100 vencido",1],["Tarefas pendentes","5","1 atrasada",1],["Peças recentes","7","Réplica — Camila",0]].map(([l,v,s,a])=>`<div class="kpi ${a?"a":""}"><b class="tabular">${v}</b><small>${l}</small><em>${s}</em></div>`).join("")}</div>
+</div>`;
+const demoPecas = `
+<div class="d-col">
+  <div class="inp"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#98A2B3" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>preciso responder uma contestação</div>
+  <div class="sug"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E2FF1A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4V2M15 16v-2M8 9h2M20 9h2M17.8 11.8 19 13M15 9h0M17.8 6.2 19 5M3 21l9-9M12.2 6.2 11 5"/></svg><div><b>Sugestão: Réplica</b><small>Responder à contestação é, em regra, réplica.</small></div></div>
+  <div class="box"><h4>Informações identificadas</h4>
+    ${[["Cargo","Auxiliar de produção"],["Salário","R$ 2.400"],["Admissão","janeiro/2023"],["Jornada","7h às 18h"]].map(([k,v])=>`<div class="fact">${svgCheck}<span>${k}</span><span>${v}</span></div>`).join("")}
+    <div class="msg"><div class="ross-av sm">R</div><div class="bubble">Entendi. Para completar a réplica, preciso saber: houve registro em carteira?</div></div></div>
+</div>`;
+const demoEditor = `
+<div class="editor">
+  <div class="paper"><div class="tb">${["B","I","U","H2","≡","1¶","Word","PDF"].map(x=>`<span class="${x==="Word"?"on":""}">${x}</span>`).join("")}</div>
+    <h5>Da impugnação ao mérito</h5><p>Os cartões de ponto juntados pela reclamada registram horários invariáveis de entrada e saída, o que lhes retira a força probatória…</p><blockquote>Trecho da decisão inserida pela pesquisa, com link para o tribunal.</blockquote></div>
+  <div class="side">${["Ross","Jurisprudência","Revisão","Versões"].map((t,i)=>`<span class="${i===0?"on":""}">${t}</span>`).join("")}${["Melhore esse argumento","Deixe mais técnico","Fundamente melhor","Incluir jurisprudência"].map(a=>`<span class="ac">${a}</span>`).join("")}</div>
+</div>`;
+const demoRoss = `
+<div class="chat">
+  <div class="me">A empresa juntou cartões de ponto com horários iguais todos os dias. Isso vale como prova?</div>
+  <div class="them"><div class="ross-av sm">R</div><div class="b"><p><strong>Em regra, não.</strong> Registros invariáveis costumam ser tratados como inválidos para provar a jornada, e o ônus tende a se inverter para o empregador.</p><p>Quer que eu pesquise jurisprudência sobre isso com link para a fonte?</p><div class="acts"><span>Copiar</span><span>Transformar em peça</span></div></div></div>
+  <div class="note">Exemplo ilustrativo de conversa. Fundamentos sugeridos pela IA — conferir na fonte oficial.</div>
+</div>`;
+const demoJuris = `
+<div class="d-col">
+  <div class="juris"><div class="hd"><b>TST</b><span>Acórdão</span><span>relator · dd/mm/aaaa</span><em>Fonte oficial</em></div>
+    <h6>Aqui aparece o tema da decisão encontrada na busca</h6><p>“Trecho da ementa citado da própria página do tribunal.”</p>
+    <div class="ft"><a href="#" onclick="return false">tst.jus.br ↗</a><span>Adicionar à peça</span></div></div>
+  <div class="note">Card ilustrativo: os campos são preenchidos pela busca real. O JurisClik não inventa decisões.</div>
+</div>`;
+const demoProc = `
+<div class="d-col">
+  <div class="and"><div class="m">20/09/2026 <b>EXIGE AÇÃO</b></div><div class="t">Penhora realizada sobre imóvel do executado</div></div>
+  <div class="sugc"><div class="k"><span class="p">Principal</span><span>Confiança alta</span><span>15 dias · art. 525 do CPC (conferir)</span></div>
+    <h6>Impugnação à penhora</h6><p>A penhora recaiu sobre imóvel do cliente. Vale verificar impenhorabilidade e excesso antes do prazo.</p>
+    <div class="acts"><span class="p">Autorizar → tarefa</span><span>Gerar peça</span><span>Reorientar</span><span>Descartar</span></div></div>
+  <div class="note">Exemplo ilustrativo. No produto, os botões criam a tarefa, abrem o gerador ou refazem a sugestão.</div>
+</div>`;
+const demoAgenda = `
+<div>
+  <div class="week">
+    <div class="day"><div class="h">Seg <b>14</b></div><div class="ev" style="border-color:#1D4ED8">14:00 Audiência — instrução</div></div>
+    <div class="day"><div class="h">Ter <b>15</b></div><div class="ev" style="border-color:#B91C1C">Réplica — prazo fatal</div><div class="ev" style="border-color:#6B6F00;opacity:.4">10:00 Reunião com cliente</div></div>
+    <div class="day"><div class="h">Qua <b>16</b></div></div>
+    <div class="day on"><div class="h">Qui <b>17</b></div><div class="drop">Soltar em qui 17 →</div></div>
+    <div class="day"><div class="h">Sex <b>18</b></div></div>
+  </div>
+  <div class="note" style="margin-top:8px">Arraste o compromisso para outro dia. Prazos legais não se arrastam.</div>
+</div>`;
+const demoCalc = `
+<div class="calc">
+  ${[["Saldo de salário","R$ 1.120,00"],["Aviso prévio indenizado","R$ 2.640,00"],["13º proporcional","R$ 600,00"],["Férias + 1/3 (proporcionais)","R$ 1.066,67"],["Horas extras (50%)","R$ 3.981,82"],["FGTS + multa de 40%","R$ 3.763,20"]].map(([k,v])=>`<div class="r"><span>${k}</span><b class="tabular">${v}</b></div>`).join("")}
+  <div class="tot"><span>Total dos pedidos</span><b class="tabular">R$ 13.171,69</b></div>
+  <div class="note" style="padding:8px 14px;background:#fff">Valores ilustrativos. A calculadora mostra a memória de cálculo de cada verba.</div>
+</div>`;
+
+
+const I={home:'<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/>',zap:'<path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/>',wand:'<path d="M15 4V2M15 16v-2M8 9h2M20 9h2M17.8 11.8 19 13M17.8 6.2 19 5M3 21l9-9M12.2 6.2 11 5"/>',scale:'<path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1zM2 16l3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1zM7 21h10M12 3v18M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/>',users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',brief:'<rect width="20" height="14" x="2" y="7" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>',clock:'<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',cal:'<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',wallet:'<path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>',calc:'<rect width="16" height="20" x="4" y="2" rx="2"/><path d="M8 6h8M16 14v4M16 10h.01M12 10h.01M8 10h.01M12 14h.01M8 14h.01M12 18h.01M8 18h.01"/>',bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',plus:'<path d="M5 12h14M12 5v14"/>',list:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>'};
+const sv=(p,w=13)=>`<svg width="${w}" height="${w}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+const logoSvg='<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 4v10.5a4.5 4.5 0 0 1-7 3.7" stroke="#111318" stroke-width="2.6" stroke-linecap="round"/><path d="M13.5 12.5 21 20" stroke="#111318" stroke-width="2.6" stroke-linecap="round"/><path d="M13.5 4.5l1.2 3 3-1.2-1.2 3 3 1.2-3 1.2" stroke="#111318" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const atencao=[["u","Prazo fatal amanhã","Réplica — Camila R. × Indústria Têxtil","#B91C1C"],["w","Audiência quinta, 14h","Instrução — Marcos A. × Transportadora","#B45309"],["","Honorário vencido há 6 dias","R$ 2.100 — Contrato 018","#667085"]];
+const agenda=[["09:00","#6B6F00","Reunião — Dona Célia (videochamada)"],["11:30","#B91C1C","Prazo — contrarrazões"],["14:00","#1D4ED8","Audiência — instrução (Vara do Trabalho)"],["16:00","#6B6F00","Revisar minuta — réplica"]];
+const kpis=[["3","Prazos até 7 dias","1 amanhã",1],["1","Audiência","quinta, 14h",0],["12","Processos ativos","15 no total",0],["R$ 18.400","A receber","R$ 2.100 vencido",1],["5","Tarefas","1 atrasada",1],["7","Peças este mês","última: réplica",0]];
+
+const demoDashDesk=`
+<div class="shell">
+  <aside class="sb">
+    <div class="lg"><i>${logoSvg}</i><b>JurisClik</b></div>
+    <div><div class="it on">${sv(I.home)}Dashboard</div></div>
+    <div><div class="grp">Inteligência</div><div class="it hl">${sv(I.zap)}Ross</div><div class="it hl">${sv(I.wand)}Peças</div><div class="it">${sv(I.scale)}Jurisprudência</div></div>
+    <div><div class="grp">Escritório</div><div class="it">${sv(I.users)}Clientes</div><div class="it">${sv(I.brief)}Processos</div><div class="it">${sv(I.clock)}Prazos<span class="bd">3</span></div><div class="it">${sv(I.cal)}Agenda</div><div class="it">${sv(I.list)}Tarefas<span class="bd">5</span></div></div>
+    <div><div class="grp">Gestão</div><div class="it">${sv(I.wallet)}Financeiro</div><div class="it">${sv(I.calc)}Super Calculadora</div></div>
+  </aside>
+  <div class="main">
+    <div class="top"><div class="srch">${sv(I.search)}Buscar processo, cliente, peça…<kbd>⌘K</kbd></div><div class="ico">${sv(I.bell,14)}<i></i></div><div class="av">AL</div></div>
+    <div class="cont">
+      <div class="hdr"><div><b>Bom dia, Dra. Ana.</b><small>Segunda, 28 de setembro · 3 itens pedem atenção hoje</small></div><div class="nb">${sv(I.plus,12)} Nova peça</div></div>
+      <div class="att">${atencao.map(([t,a,b,c])=>`<div class="${t}"><i style="background:${c}"></i><span><b>${a}</b><small>${b}</small></span></div>`).join("")}</div>
+      <div class="kpis" style="grid-template-columns:repeat(6,1fr)">${kpis.map(([v,l,s,a])=>`<div class="kpi ${a?"a":""}"><b class="tabular ${v.startsWith("R$")?"money":""}">${v}</b><small>${l}</small><em>${s}</em></div>`).join("")}</div>
+      <div class="two">
+        <div class="pnl"><h5>Honorários — recebido e previsto <span>últimos 6 meses</span></h5>
+          <div class="bars">${[48,62,55,80,70,58].map((h,i)=>`<div class="${i===5?"p":""}"><i style="height:${h}%"></i></div>`).join("")}</div>
+          <div class="bars-l">${["abr","mai","jun","jul","ago","set"].map(m=>`<span>${m}</span>`).join("")}</div></div>
+        <div class="pnl"><h5>Agenda de hoje <span>4 itens</span></h5><div class="ag">${agenda.map(([h,c,t])=>`<div><b>${h}</b><i style="background:${c}"></i><span>${t}</span></div>`).join("")}</div></div>
+      </div>
+    </div>
+  </div>
+</div>`;
+
+const demoDashMobile=`
+<div class="m-hd"><div class="lg"><i>${logoSvg}</i><span><b>JurisClik</b><small>Bom dia, Dra. Ana</small></span></div><div class="r"><i>${sv(I.bell,15)}<b></b></i><i class="av">AL</i></div></div>
+<div class="m-body">
+  <div class="m-ross"><div class="id"><div class="ross-av" style="width:34px;height:34px;font-size:12px">R</div><div><div class="ross-k">Ross</div><div class="ross-q" style="font-size:14px">Em que posso ajudar?</div></div></div>
+    <div class="chips">${["Criar uma peça","Tirar uma dúvida","Jurisprudência","Analisar caso"].map(a=>`<span>${a}</span>`).join("")}</div></div>
+  <div class="m-sec">Atenção agora <span>ver tudo</span></div>
+  <div class="m-att">${atencao.slice(0,2).map(([t,a,b,c])=>`<div class="${t}"><i style="background:${c}"></i><span><b>${a}</b><small>${b}</small></span><em style="background:${t==="u"?"#FDECEC":"#FDF4E3"};color:${c}">${t==="u"?"1 dia":"3 dias"}</em></div>`).join("")}</div>
+  <div class="m-kpis">${kpis.slice(0,4).map(([v,l,s,a])=>`<div class="${a?"a":""}"><b class="tabular ${v.startsWith("R$")?"money":""}">${v}</b><small>${l}</small><em>${s}</em></div>`).join("")}</div>
+  <div class="m-sec">Hoje <span>agenda</span></div>
+  <div class="m-ag">${agenda.slice(0,3).map(([h,c,t])=>`<div><b>${h}</b><i style="background:${c}"></i><span>${t}</span></div>`).join("")}</div>
+</div>
+<div class="m-tab">
+  <div class="on">${sv(I.home,20)}Início</div><div>${sv(I.brief,20)}Processos</div><div class="c"><i>${sv(I.wand,20)}</i>Nova peça</div><div>${sv(I.cal,20)}Agenda</div><div>${sv(I.zap,20)}Ross</div>
+</div>`;
+
+$("#demo-dash").innerHTML=demoDashDesk; $("#demo-dash-m").innerHTML=demoDashMobile;
+
+/* device toggle */
+$$("[data-dev]").forEach(b=>b.addEventListener("click",()=>{
+  $$("[data-dev]").forEach(x=>x.classList.toggle("on",x===b));
+  const c=$("#dev-computador"), m=$("#dev-celular");
+  const show=b.dataset.dev==="computador"?c:m, hide=show===c?m:c;
+  hide.hidden=true; show.hidden=false; show.classList.remove("swap","frame-3d"); void show.offsetWidth; show.classList.add("swap");
+}));
+
+/* marquee */
+const faixa=["19 tipos de peça","Jurisprudência com link do tribunal","Prazos CPC, CLT e corridos","Super Calculadora com memória","Exporta em Word e PDF","Ross com o contexto do caso","Sem cartão para testar","Funciona no celular"];
+$("#track").innerHTML=[...faixa,...faixa].map(x=>`<span><i></i>${x}</span>`).join("");
+
+/* tour */
+const ic={
+  wand:'<path d="M15 4V2M15 16v-2M8 9h2M20 9h2M17.8 11.8 19 13M15 9h0M17.8 6.2 19 5M3 21l9-9M12.2 6.2 11 5"/>',
+  file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>',
+  zap:'<path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/>',
+  scale:'<path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1zM2 16l3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1zM7 21h10M12 3v18M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/>',
+  brief:'<rect width="20" height="14" x="2" y="7" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>',
+  cal:'<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+  calc:'<rect width="16" height="20" x="4" y="2" rx="2"/><path d="M8 6h8M16 14v4M16 10h.01M12 10h.01M8 10h.01M12 14h.01M8 14h.01M12 18h.01M8 18h.01"/>'
+};
+const svg=p=>`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+const demos=[
+  {nome:"Gerador de peças",resumo:"19 tipos, a partir do seu relato",icone:ic.wand,titulo:"JurisClik · Nova peça",demo:demoPecas,frase:"Você conta o caso. O JurisClik identifica a peça e extrai os fatos.",como:"Diga com suas palavras o que precisa — “preciso responder uma contestação”. Ele reconhece a peça, lê os documentos anexados e pergunta só o que falta.",ganho:"A primeira versão sai em minutos"},
+  {nome:"Editor da peça",resumo:"Word, PDF, papel timbrado",icone:ic.file,titulo:"JurisClik · Editor da peça",demo:demoEditor,frase:"A minuta abre pronta para revisar, com o Ross ao lado.",como:"Selecione um trecho e peça para fortalecer, fundamentar ou incluir jurisprudência. Exporte em Word com o seu timbrado, ou em PDF numerado.",ganho:"Do rascunho ao protocolo sem trocar de aba"},
+  {nome:"Ross, o assistente",resumo:"Responde já sabendo do processo",icone:ic.zap,titulo:"JurisClik · Ross",demo:demoRoss,frase:"Uma segunda opinião técnica, disponível a qualquer hora.",como:"Aberto de dentro do processo, o Ross já conhece as partes, os andamentos e as peças. Responde direto e diz o que precisa ser conferido.",ganho:"Nunca inventa precedente"},
+  {nome:"Jurisprudência",resumo:"Busca ao vivo, com link da fonte",icone:ic.scale,titulo:"JurisClik · Jurisprudência",demo:demoJuris,frase:"Cada decisão vem com tribunal, número, relator e o link.",como:"A pesquisa é feita na web na hora, priorizando sites de tribunais. Decisão encontrada em fonte oficial recebe o selo; as demais pedem conferência. Um clique insere na peça.",ganho:"Zero ementa copiada às cegas"},
+  {nome:"Andamentos",resumo:"O que exige ação, sinalizado",icone:ic.brief,titulo:"JurisClik · Andamentos do processo",demo:demoProc,frase:"Importe a consulta do tribunal. O Ross aponta o próximo passo.",como:"Prioridade, confiança, prazo provável e o raciocínio por trás. Você autoriza — vira tarefa ou peça —, reorienta ou descarta.",ganho:"Nada se perde entre dezenas de andamentos"},
+  {nome:"Prazos e agenda",resumo:"CPC, CLT e dias corridos",icone:ic.cal,titulo:"JurisClik · Agenda",demo:demoAgenda,frase:"Prazo contado entra sozinho na agenda. Compromisso se arrasta; prazo fatal, não.",como:"Audiências, tarefas e compromissos no mesmo calendário dos prazos, com a regra de contagem registrada.",ganho:"Uma agenda que entende prazo fatal"},
+  {nome:"Super Calculadora",resumo:"Verbas com memória de cálculo",icone:ic.calc,titulo:"JurisClik · Super Calculadora",demo:demoCalc,frase:"Saldo, aviso, 13º, férias, horas extras, FGTS e multas — auditáveis.",como:"Cada verba mostra fórmula, parâmetros e memória, prontos para imprimir e anexar como valor da causa.",ganho:"Sem planilha refeita à mão"},
+];
+$("#tabs").innerHTML=demos.map((d,i)=>`<button class="tab ${i===0?"on auto":""}" role="tab" aria-selected="${i===0}" data-i="${i}">${svg(d.icone)}<span><b>${d.nome}</b><small>${d.resumo}</small></span><span class="prog"><i></i></span></button>`).join("");
+$("#panels").innerHTML=demos.map((d,i)=>`<div class="panel ${i===0?"on":""}" role="tabpanel" data-i="${i}">
+  <div class="mold"><div class="mold-bar"><i style="background:#FF5F57"></i><i style="background:#FEBC2E"></i><i style="background:#28C840"></i><span>${d.titulo}</span></div><div class="mold-body">${d.demo}</div></div>
+  <div class="panel-text"><div><b>${d.frase}</b><p>${d.como}</p></div><span class="gain">${svg(ic.zap)}${d.ganho}</span></div></div>`).join("");
+let ativo=0, auto=!reduz, timer;
+function irAba(i){ ativo=i; $$(".tab").forEach(t=>{const on=+t.dataset.i===i;t.classList.toggle("on",on);t.classList.toggle("auto",on&&auto);t.setAttribute("aria-selected",on); if(on){const p=$(".prog i",t);p.style.animation="none";void p.offsetWidth;p.style.animation="";}}); $$(".panel").forEach(p=>p.classList.toggle("on",+p.dataset.i===i)); agendar(); }
+function agendar(){ clearTimeout(timer); if(auto) timer=setTimeout(()=>irAba((ativo+1)%demos.length),7000); }
+$$(".tab").forEach(t=>t.addEventListener("click",()=>{auto=false;irAba(+t.dataset.i);}));
+agendar();
+
+
+/* dia com / sem */
+const diaCats=[["Redigir peças","#111318","#fff"],["Pesquisar jurisprudência","#475467","#fff"],["Andamentos e prazos","#98A2B3","#111318"],["Cálculos","#D0D5DD","#111318"],["Atender, captar e faturar","#E2FF1A","#111318"]];
+const diaH={sem:[4,1.5,1,1,1.5],com:[1.2,0.5,0.4,0.3,6.6]};
+const fh=h=>{const m=Math.round(h*60),hh=Math.floor(m/60),mm=m%60;return hh?(mm?`${hh}h${String(mm).padStart(2,"0")}`:`${hh}h`):`${mm} min`;};
+$("#dia-bar").innerHTML=diaCats.map(([n,c,t])=>`<div style="background:${c};color:${t}" title="${n}"></div>`).join("");
+$("#dia-leg").innerHTML=diaCats.map(([n,c],i)=>`<div class="${i===4?"hl":""}"><i style="background:${c};${i===4?"box-shadow:0 0 0 1px #C7D600":""}"></i><span><b></b><small>${n}</small></span></div>`).join("");
+function dia(modo){
+  const h=diaH[modo], tot=h.reduce((a,b)=>a+b,0);
+  $$("#dia-bar div").forEach((el,i)=>{el.style.width=(h[i]/tot*100)+"%"; el.textContent=h[i]>=0.9?fh(h[i]):"";});
+  $$("#dia-leg b").forEach((el,i)=>el.textContent=fh(h[i]));
+  $$("[data-dia]").forEach(b=>b.classList.toggle("on",b.dataset.dia===modo));
+  $("#dia-txt").innerHTML= modo==="sem" ? `Sobra <b>${fh(h[4])}</b> para o que gera receita: atender, captar e cobrar.` : `Sobram <b>${fh(h[4])}</b> para o que gera receita. Mesmo expediente, mesmo escritório.`;
+}
+let diaTocou=false;
+$$("[data-dia]").forEach(b=>b.addEventListener("click",()=>{diaTocou=true;dia(b.dataset.dia);}));
+dia("sem");
+const diaObs=new IntersectionObserver(es=>es.forEach(en=>{ if(en.isIntersecting){ diaObs.disconnect(); if(!reduz) setTimeout(()=>{ if(!diaTocou) dia("com"); },1400); } }),{threshold:.45});
+diaObs.observe($("#dia"));
+
+/* contadores */
+const cnt=new IntersectionObserver(es=>es.forEach(en=>{ if(!en.isIntersecting) return; cnt.unobserve(en.target); const el=en.target, ate=+el.dataset.count; if(reduz){el.textContent=ate;return;} const t0=performance.now(); const tick=t=>{const k=Math.min(1,(t-t0)/1100), e=1-Math.pow(1-k,3); el.textContent=Math.round(ate*e); if(k<1) requestAnimationFrame(tick);}; requestAnimationFrame(tick); }),{threshold:.4});
+$$("[data-count]").forEach(el=>cnt.observe(el));
+
+/* simulador */
+const fmtH=h=>(Number.isInteger(h)?h:h.toFixed(1)).toString().replace(".",",")+" h";
+const brl0=v=>brl(v).replace(",00","");
+function simular(){
+  const pecas=+$("#i-pecas").value, hp=+$("#i-hp").value, pesq=+$("#i-pesq").value, hora=+$("#i-hora").value, fer=+$("#i-fer").value;
+  $("#v-pecas").textContent=pecas; $("#v-hp").textContent=fmtH(hp); $("#v-pesq").textContent=pesq; $("#v-hora").textContent=brl0(hora); $("#v-fer").textContent=brl0(fer)+"/mês";
+  const hSem=pecas*hp*0.7+pesq*(20/60), hMes=hSem*4.3, val=hMes*hora;
+  $("#o-sem").textContent=fmtH(Math.round(hSem*2)/2); $("#o-mes").textContent=fmtH(Math.round(hMes)); $("#o-val").textContent=brl(Math.round(val)); $("#o-fer").textContent=brl(fer)+"/mês";
+  const n=Math.max(1,Math.ceil(PRECOS.mensal/hora));
+  $("#o-verd").textContent= val>PRECOS.mensal ? `O plano se paga com ${n} hora${n>1?"s":""} recuperada${n>1?"s":""} no mês.` : "Com esses números, o ganho é mais de organização do que de horas — ajuste os valores para o seu caso.";
+  $$("input[type=range]").forEach(r=>{const p=((r.value-r.min)/(r.max-r.min))*100; r.style.background=`linear-gradient(90deg,#E2FF1A ${p}%,#E5E7EB ${p}%)`;});
+}
+$$("input[type=range]").forEach(r=>r.addEventListener("input",simular)); simular();
+
+
+/* oferta */
+const OF_JUSTO=197; // valor justo do pacote por mês
+const ofIc={peca:'<path d="M15 4V2M15 16v-2M8 9h2M20 9h2M17.8 11.8 19 13M17.8 6.2 19 5M3 21l9-9M12.2 6.2 11 5"/>',ross:'<path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/>',jur:'<path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1zM2 16l3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1zM7 21h10M12 3v18M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/>',and:'<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',ger:'<rect width="20" height="14" x="2" y="7" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>',prz:'<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',calc:'<rect width="16" height="20" x="4" y="2" rx="2"/><path d="M8 6h8M16 14v4M16 10h.01M12 10h.01M8 10h.01M12 14h.01M8 14h.01"/>',fin:'<path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>',ed:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8"/>'};
+const oferta=[
+ ["peca","Gerador de peças com IA","19 tipos, do trabalhista ao criminal, a partir do seu relato",79],
+ ["ross","Assistente Ross ilimitado","Responde já sabendo das partes, andamentos e peças do caso",59],
+ ["jur","Pesquisa de jurisprudência","Busca ao vivo, com link do tribunal e selo de fonte oficial",49],
+ ["ger","Gestão de processos e clientes","Processos, documentos, clientes e contratos no mesmo lugar",49],
+ ["and","Análise de andamentos","O que exige ação, com próximo passo e prazo provável",39],
+ ["calc","Super Calculadora trabalhista","Verbas com fórmula e memória de cálculo para anexar",39],
+ ["prz","Prazos e agenda","CPC, CLT e dias corridos, direto na agenda",29],
+ ["fin","Financeiro e relatórios","Honorários a receber, recebidos e em atraso",29],
+ ["ed","Editor, teses e versões","Word e PDF com timbrado, biblioteca de teses, estilo e histórico",29],
+];
+const OF_SEP=oferta.reduce((a,x)=>a+x[3],0);
+const brlI=v=>"R$ "+Math.round(v).toLocaleString("pt-BR");
+$("#rc-rows").innerHTML=oferta.map(([k,t,d,v],i)=>`<div class="rc-row" style="transition-delay:${i*90}ms"><span class="i"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ofIc[k]}</svg></span><span><b>${t}</b><small>${d}</small></span><span class="v">${brlI(v)}<span>/mês</span></span></div>`).join("");
+$("#tk-sep").textContent=brlI(OF_SEP)+"/mês";
+$("#tk-justo").textContent=brlI(OF_JUSTO)+"/mês";
+$("#tk-eco1").textContent=brl(OF_SEP*12-PRECOS.anual);
+$("#tk-eco2").textContent=Math.round((1-PRECOS.mensalEquivalente/OF_JUSTO)*100)+"% menos";
+$$("#tk [data-preco]").forEach(el=>el.textContent=brl(PRECOS[el.dataset.preco]));
+const rcObs=new IntersectionObserver(es=>es.forEach(en=>{ if(!en.isIntersecting) return; rcObs.disconnect();
+  $("#rc").classList.add("on");
+  const dur=reduz?0:oferta.length*90+700, t0=performance.now(), el=$("#rc-tot");
+  const tick=t=>{const k=dur?Math.min(1,(t-t0)/dur):1, e=1-Math.pow(1-k,3); el.textContent=brlI(OF_SEP*e)+"/mês"; if(k<1) requestAnimationFrame(tick); else $("#tk").classList.add("done");};
+  requestAnimationFrame(tick);
+}),{threshold:.15});
+rcObs.observe($("#rc")); rcObs.observe($("#tk"));
+
+/* preço: ciclo + spotlight */
+$$("[data-ciclo]").forEach(b=>b.addEventListener("click",()=>{ $$("[data-ciclo]").forEach(x=>x.classList.toggle("on",x===b)); $$(".plano").forEach(p=>{const on=p.dataset.plano===b.dataset.ciclo; p.classList.toggle("on",on); const a=$("[data-assinar]",p); a.classList.toggle("btn-neon",on); a.classList.toggle("btn-ghost-dark",!on);}); $("#bar-preco").textContent=brl(b.dataset.ciclo==="anual"?PRECOS.mensalEquivalente:PRECOS.mensal); }));
+$("#bar-preco").textContent=brl(PRECOS.mensalEquivalente);
+$$(".plano").forEach(p=>{ p.addEventListener("pointermove",e=>{const r=p.getBoundingClientRect();p.style.setProperty("--mx",(e.clientX-r.left)+"px");p.style.setProperty("--my",(e.clientY-r.top)+"px");}); p.addEventListener("pointerleave",()=>{p.style.setProperty("--mx","-999px");p.style.setProperty("--my","-999px");}); });
+
+/* faq */
+const faq=[
+ ["Posso experimentar antes de pagar?","Sim, sem cartão. Cada ferramenta principal libera 1 uso gratuito com o seu caso real: 1 peça, 1 resposta do Ross, 1 pesquisa, 1 análise de andamentos e 1 cálculo. Processos, prazos, agenda, clientes, financeiro e contratos ficam liberados desde o primeiro dia."],
+ ["Serve para qualquer área do Direito?","Sim. São 19 tipos de peça, do trabalhista ao criminal, e o Ross e a pesquisa de jurisprudência funcionam para qualquer matéria. A Super Calculadora é voltada a verbas trabalhistas."],
+ ["Serve para um escritório com vários advogados?","Sim — cada advogado usa o JurisClik no próprio trabalho e produz mais com a mesma estrutura. Nesta versão, processos e agenda não são compartilhados entre contas; os dados ficam no navegador de quem usa."],
+ ["O que acontece depois do uso gratuito?","A ferramenta avisa que a degustação terminou e mostra os planos. Nada some: tudo o que você criou continua salvo."],
+ ["A jurisprudência é confiável?","Cada resultado vem de uma busca na web feita na hora, com link para a página encontrada. Decisões em sites de tribunais recebem o selo “Fonte oficial”. O JurisClik nunca preenche número, relator ou data de memória."],
+ ["O JurisClik substitui o advogado?","Não. Ele é um copiloto: gera minutas, pesquisa, sugere e organiza. Toda peça sai marcada como minuta para revisão, e as citações pedem conferência na fonte antes do protocolo."],
+ ["Qual a diferença entre mensal e anual?",`Só o preço. O anual custa ${brl(PRECOS.anual)} pagos uma vez — equivale a ${brl(PRECOS.mensalEquivalente)} por mês e economiza ${brl(PRECOS.economia)} frente a 12 meses no mensal. O acesso é o mesmo, completo e ilimitado.`],
+ ["Posso cancelar?","Quando quiser. No anual, o período já pago continua válido até o fim do ano contratado."],
+ ["Meus dados ficam seguros?","A IA recebe apenas o necessário para cada tarefa — sem CPF, telefone ou e-mail de clientes — e não há chave de acesso no seu navegador. Login, backup e sincronização chegam com o servidor do JurisClik."],
+];
+$("#faq-list").innerHTML=faq.map(([q,a])=>`<div class="q"><button aria-expanded="false">${q}<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button><div class="a"><div><p>${a}</p></div></div></div>`).join("");
+$$(".q button").forEach(b=>b.addEventListener("click",()=>{const q=b.parentElement, on=!q.classList.contains("on"); $$(".q").forEach(x=>{x.classList.remove("on");$("button",x).setAttribute("aria-expanded","false");}); if(on){q.classList.add("on");b.setAttribute("aria-expanded","true");}}));
+
+/* nav, reveal, spy, barra */
+const nav=$("#nav"), bar=$("#bar");
+addEventListener("scroll",()=>{ nav.classList.toggle("on",scrollY>24); const on=scrollY>640; bar.classList.toggle("on",on); bar.setAttribute("aria-hidden",!on); },{passive:true});
+const rev=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){en.target.classList.add("on");rev.unobserve(en.target);}}),{threshold:.1});
+$$(".rev").forEach(el=>rev.observe(el));
+const spy=new IntersectionObserver(es=>es.forEach(en=>{ if(en.isIntersecting) $$("[data-spy]").forEach(a=>a.classList.toggle("on",a.dataset.spy===en.target.id)); }),{rootMargin:"-40% 0px -55% 0px"});
+["tour","paraquem","contas","precos","faq"].forEach(id=>{const el=document.getElementById(id); if(el) spy.observe(el);});
+</script>
+</body>
+</html>
