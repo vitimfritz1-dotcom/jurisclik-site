@@ -176,7 +176,7 @@ section{padding:64px 0}
 .tab b{display:block;font-size:13.5px;font-weight:600;white-space:nowrap}.tab small{display:block;font-size:11.5px;color:var(--low);white-space:nowrap}.tab.on small{color:var(--on-dark-mid)}
 .prog{position:absolute;left:12px;right:12px;bottom:4px;height:2px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;display:none}.tab.on.auto .prog{display:block}
 .prog i{display:block;height:100%;background:var(--neon);animation:prog 7s linear both}@keyframes prog{from{width:0}to{width:100%}}
-.panel{display:none}.panel.on{display:block;animation:swap .38s cubic-bezier(.16,1,.3,1) both}
+#panels{display:grid}#panels>.panel{display:block;grid-area:1/1;visibility:hidden;opacity:0;pointer-events:none}#panels>.panel.on{visibility:visible;opacity:1;pointer-events:auto;animation:swap .38s cubic-bezier(.16,1,.3,1) both}
 .panel-text{display:grid;grid-template-columns:1fr;gap:16px;margin-top:20px}@media(min-width:640px){.panel-text{grid-template-columns:1fr auto;align-items:center}}
 .panel-text b{display:block;font-size:17px;font-weight:600;letter-spacing:-.01em}@media(min-width:640px){.panel-text b{font-size:19px}}
 .panel-text p{font-size:14px;color:var(--mid);margin-top:6px;line-height:1.55}
@@ -479,6 +479,20 @@ body{max-width:100%;overscroll-behavior-x:none}
 }
 
 
+
+/* ===== Simulador simplificado ===== */
+.sim-q{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--ink,#111318);color:var(--neon);font-size:11px;font-weight:700;margin-right:8px;vertical-align:1px}
+.rng label{align-items:center;gap:10px}.rng label b{white-space:nowrap;color:var(--hi,#111318)}
+.sim-note b{color:var(--mid,#475467)}
+.sim-bars{display:flex;flex-direction:column;gap:12px;margin-top:12px}
+.sim-bars>div{display:grid;grid-template-columns:120px 1fr 64px;align-items:center;gap:10px;font-size:13px;color:var(--on-dark-mid,#9AA4B2)}
+.sim-bars .tr{height:12px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+.sim-bars i{display:block;height:100%;border-radius:999px;background:#6B7280;transition:width .45s cubic-bezier(.2,.8,.2,1)}
+.sim-bars i.n{background:var(--neon);box-shadow:0 0 12px rgba(226,255,26,.5)}
+.sim-bars b{color:#fff;text-align:right;font-weight:600}
+.sim-eq{font-size:14px;color:#C9CFD8;margin-top:8px}
+@media(max-width:480px){.sim-bars>div{grid-template-columns:96px 1fr 56px;font-size:12px}.rng label{flex-direction:column;align-items:flex-start;gap:4px}}
+
 /* ===== Logo atual nas telas ===== */
 .lg i{background:transparent!important;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.08)}
 .sb .lg-h{padding:0 4px 4px}.sb .lg-h img{height:34px;width:auto;display:block}
@@ -526,6 +540,8 @@ h1 .fx-shine,.fx-shine{background:linear-gradient(100deg,#fff 30%,var(--neon) 50
 @keyframes fxShine{0%,40%{background-position:120% 0}100%{background-position:-120% 0}}
 @media(prefers-reduced-motion:reduce){.fx-aurora,.fx-progress,.hero .fx-spot{display:none}.btn-neon::after,.fx-glowborder::before,.fx-shine{animation:none!important}.fx-shine{color:#fff;background:none}}
 @media(hover:none){.hero .fx-spot{display:none}}
+@media(max-width:900px){.fx-aurora{display:none}.fx-progress{display:none}}
+html{overflow-anchor:auto}
 
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.rev{opacity:1;transform:none}.rc-row{opacity:1;transform:none}}
 </style>
@@ -652,26 +668,26 @@ h1 .fx-shine,.fx-shine{background:linear-gradient(100deg,#fff 30%,var(--neon) 50
 <!-- SIMULADOR -->
 <section class="rev" id="contas">
   <div class="wrap">
-    <div style="max-width:760px;margin-bottom:40px"><h2>Quantas horas você recupera por mês?</h2><p class="lead" style="margin-top:12px">Coloque a sua rotina nos controles. A conta é feita com os seus números, não com os nossos.</p></div>
+    <div style="max-width:760px;margin-bottom:32px"><h2>Quantas horas você recupera por mês?</h2><p class="lead" style="margin-top:12px">Responda 3 perguntas sobre a sua rotina. A conta aparece na hora.</p></div>
     <div class="sim">
       <div class="sim-in">
-        <div class="rng"><label>Peças que você redige por semana <b id="v-pecas"></b></label><input type="range" id="i-pecas" min="1" max="30" value="6"></div>
-        <div class="rng"><label>Horas gastas por peça hoje <b id="v-hp"></b></label><input type="range" id="i-hp" min="0.5" max="8" step="0.5" value="2"></div>
-        <div class="rng"><label>Pesquisas de jurisprudência por semana <b id="v-pesq"></b></label><input type="range" id="i-pesq" min="0" max="30" value="4"></div>
-        <div class="rng"><label>Valor da sua hora <b id="v-hora"></b></label><input type="range" id="i-hora" min="80" max="1000" step="10" value="250"></div>
-        <div class="rng"><label>O que você paga hoje em ferramentas <b id="v-fer"></b></label><input type="range" id="i-fer" min="0" max="1500" step="10" value="300"></div>
-        <p class="sim-note">Premissas da conta: a primeira versão da peça passa a tomar cerca de 30% do tempo atual (você ainda revisa); cada pesquisa com link da fonte poupa cerca de 20 minutos de busca em abas. Mês de 4,3 semanas. Simulação ilustrativa — o resultado depende da sua rotina.</p>
+        <div class="rng"><label><span><span class="sim-q">1</span>Quantas peças você faz por semana?</span> <b id="v-pecas"></b></label><input type="range" id="i-pecas" min="1" max="30" value="6" aria-label="Peças por semana"></div>
+        <div class="rng"><label><span><span class="sim-q">2</span>Quanto tempo leva cada peça hoje?</span> <b id="v-hp"></b></label><input type="range" id="i-hp" min="0.5" max="8" step="0.5" value="2" aria-label="Horas por peça"></div>
+        <div class="rng"><label><span><span class="sim-q">3</span>Quanto vale uma hora do seu trabalho?</span> <b id="v-hora"></b></label><input type="range" id="i-hora" min="80" max="1000" step="10" value="250" aria-label="Valor da sua hora"></div>
+        <p class="sim-note"><b>Como a conta é feita:</b> o JurisClik entrega a primeira versão da peça e você revisa. Estimamos que cada peça passe a levar cerca de 30% do tempo de hoje. É uma estimativa: o resultado real depende da sua rotina.</p>
       </div>
       <div class="sim-out">
-        <div class="g2">
-          <div><div class="lb">Horas recuperadas por semana</div><div class="v tabular" id="o-sem"></div></div>
-          <div><div class="lb">Por mês</div><div class="v tabular" id="o-mes"></div></div>
+        <div class="lb">Tempo com peças por mês</div>
+        <div class="sim-bars">
+          <div><span>Hoje</span><div class="tr"><i id="b-hoje"></i></div><b class="tabular" id="o-hoje"></b></div>
+          <div><span>Com o JurisClik</span><div class="tr"><i id="b-com" class="n"></i></div><b class="tabular" id="o-com"></b></div>
         </div>
         <hr>
-        <div class="lb">Essas horas, cobradas ao seu valor</div>
-        <div class="big tabular"><span id="o-val"></span><i>/mês</i></div>
+        <div class="lb">Você recupera por mês</div>
+        <div class="big tabular"><span id="o-mes"></span></div>
+        <p class="sim-eq" id="o-eq"></p>
         <div class="cmp">
-          <div><span>Ferramentas hoje</span><b class="tabular" id="o-fer"></b></div>
+          <div><span>Essas horas valem</span><b class="tabular" id="o-val"></b></div>
           <div><span>JurisClik anual</span><b class="n tabular"><span data-v="anualMes">R$ 83,08</span>/mês</b></div>
         </div>
         <p class="verdict" id="o-verd"></p>
@@ -1046,7 +1062,7 @@ $("#tabs").innerHTML=demos.map((d,i)=>`<button class="tab ${i===0?"on auto":""}"
 $("#panels").innerHTML=demos.map((d,i)=>`<div class="panel ${i===0?"on":""}" role="tabpanel" data-i="${i}">
   <div class="mold"><div class="mold-bar"><i style="background:#FF5F57"></i><i style="background:#FEBC2E"></i><i style="background:#28C840"></i><span>${d.titulo}</span></div><div class="mold-body">${d.demo}</div></div>
   <div class="panel-text"><div>${USO[d.uso]}<b>${d.frase}</b><p>${d.como}</p></div><span class="gain">${svg(ic.zap)}${d.ganho}</span></div></div>`).join("");
-let ativo=0, auto=!reduz, timer;
+let ativo=0, auto=!reduz && window.matchMedia("(min-width:1024px)").matches, timer;
 function irAba(i){ ativo=i; $$(".tab").forEach(t=>{const on=+t.dataset.i===i;t.classList.toggle("on",on);t.classList.toggle("auto",on&&auto);t.setAttribute("aria-selected",on); if(on){const p=$(".prog i",t);p.style.animation="none";void p.offsetWidth;p.style.animation="";}}); $$(".panel").forEach(p=>p.classList.toggle("on",+p.dataset.i===i)); agendar(); }
 function agendar(){ clearTimeout(timer); if(auto) timer=setTimeout(()=>irAba((ativo+1)%demos.length),7000); }
 $$(".tab").forEach(t=>t.addEventListener("click",()=>{auto=false;irAba(+t.dataset.i);}));
@@ -1080,12 +1096,16 @@ $$("[data-count]").forEach(el=>cnt.observe(el));
 const fmtH=h=>(Number.isInteger(h)?h:h.toFixed(1)).toString().replace(".",",")+" h";
 const brl0=v=>brl(v).replace(",00","");
 function simular(){
-  const pecas=+$("#i-pecas").value, hp=+$("#i-hp").value, pesq=+$("#i-pesq").value, hora=+$("#i-hora").value, fer=+$("#i-fer").value;
-  $("#v-pecas").textContent=pecas; $("#v-hp").textContent=fmtH(hp); $("#v-pesq").textContent=pesq; $("#v-hora").textContent=brl0(hora); $("#v-fer").textContent=brl0(fer)+"/mês";
-  const hSem=pecas*hp*0.7+pesq*(20/60), hMes=hSem*4.3, val=hMes*hora;
-  $("#o-sem").textContent=fmtH(Math.round(hSem*2)/2); $("#o-mes").textContent=fmtH(Math.round(hMes)); $("#o-val").textContent=brl(Math.round(val)); $("#o-fer").textContent=brl(fer)+"/mês";
+  const pecas=+$("#i-pecas").value, hp=+$("#i-hp").value, hora=+$("#i-hora").value;
+  $("#v-pecas").textContent=pecas+(pecas===1?" peça":" peças"); $("#v-hp").textContent=fmtH(hp); $("#v-hora").textContent=brl0(hora);
+  const hHoje=pecas*hp*4.3, hCom=hHoje*0.3, rec=hHoje-hCom, val=rec*hora, dias=rec/8;
+  $("#o-hoje").textContent=fmtH(Math.round(hHoje)); $("#o-com").textContent=fmtH(Math.round(hCom));
+  $("#b-hoje").style.width="100%"; $("#b-com").style.width=Math.max(6,hCom/hHoje*100)+"%";
+  $("#o-mes").textContent=fmtH(Math.round(rec));
+  $("#o-eq").textContent= dias>=1 ? "É como ganhar "+(Math.round(dias*2)/2).toString().replace(".",",")+" dia"+(dias>=1.5?"s":"")+" inteiro"+(dias>=1.5?"s":"")+" de trabalho (8 h) por mês." : "Menos de um dia de trabalho por mês, mas já tempo livre para atender mais.";
+  $("#o-val").textContent=brl0(Math.round(val))+"/mês";
   const n=Math.max(1,Math.ceil(ANUAL_MES/hora));
-  $("#o-verd").textContent= val>ANUAL_MES ? `O plano se paga com ${n} hora${n>1?"s":""} recuperada${n>1?"s":""} no mês.` : "Com esses números, o ganho é mais de organização do que de horas — ajuste os valores para o seu caso.";
+  $("#o-verd").textContent= val>ANUAL_MES ? "O plano anual se paga com "+n+" hora"+(n>1?"s":"")+" recuperada"+(n>1?"s":"")+" no mês. Pela sua conta, você recupera "+fmtH(Math.round(rec))+"." : "Com esses números, o ganho maior é de organização. Ajuste os valores para a sua rotina.";
   const pecasMes=Math.round(pecas*4.3);
   if(pecasMes<=P.essencial.pecas){ $("#o-plano").textContent=`Essencial ou Anual (${P.essencial.creditos} créditos)`; }
   else { $("#o-plano").textContent=`Pro (${P.pro.creditos} créditos)`; }
