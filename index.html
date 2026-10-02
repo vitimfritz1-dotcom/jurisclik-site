@@ -39,8 +39,8 @@ p{margin:0}
 @media(min-width:640px){.lead{font-size:17px}}
 .dark{background:var(--ink);color:var(--on-dark)}
 .dark h2{color:#fff}.dark .lead{color:var(--on-dark-mid)}
-section{padding:64px 0}
-@media(min-width:640px){section{padding:96px 0}}
+section{padding:56px 0}
+@media(min-width:640px){section{padding:88px 0}}
 .rev{opacity:0;transform:translateY(12px);transition:opacity .55s ease,transform .55s ease}.rev.on{opacity:1;transform:none}
 .tabular{font-variant-numeric:tabular-nums}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:13px;padding:10px 16px;border-radius:10px;transition:all .2s ease;white-space:nowrap}
@@ -176,7 +176,10 @@ section{padding:64px 0}
 .tab b{display:block;font-size:13.5px;font-weight:600;white-space:nowrap}.tab small{display:block;font-size:11.5px;color:var(--low);white-space:nowrap}.tab.on small{color:var(--on-dark-mid)}
 .prog{position:absolute;left:12px;right:12px;bottom:4px;height:2px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;display:none}.tab.on.auto .prog{display:block}
 .prog i{display:block;height:100%;background:var(--neon);animation:prog 7s linear both}@keyframes prog{from{width:0}to{width:100%}}
-#panels{display:grid}#panels>.panel{display:block;grid-area:1/1;visibility:hidden;opacity:0;pointer-events:none}#panels>.panel.on{visibility:visible;opacity:1;pointer-events:auto;animation:swap .38s cubic-bezier(.16,1,.3,1) both}
+#panels{min-width:0}#panels>.panel{display:none;min-width:0;max-width:100%}#panels>.panel.on{display:block;animation:swap .38s cubic-bezier(.16,1,.3,1) both}
+#panels .mold,#panels .mold-body,#panels .panel-text{min-width:0;max-width:100%}#panels .mold-body{overflow-x:auto;-webkit-overflow-scrolling:touch}
+@media(min-width:1024px){#panels{display:grid;grid-template-columns:minmax(0,1fr)}#panels>.panel{display:block;grid-area:1/1;visibility:hidden;opacity:0;pointer-events:none}#panels>.panel.on{visibility:visible;opacity:1;pointer-events:auto}}
+@media(max-width:767px){#panels .week{grid-template-columns:repeat(3,minmax(0,1fr))!important}#panels .week .day:nth-child(n+4){display:none}#panels .panel-text b{font-size:17px}}
 .panel-text{display:grid;grid-template-columns:1fr;gap:16px;margin-top:20px}@media(min-width:640px){.panel-text{grid-template-columns:1fr auto;align-items:center}}
 .panel-text b{display:block;font-size:17px;font-weight:600;letter-spacing:-.01em}@media(min-width:640px){.panel-text b{font-size:19px}}
 .panel-text p{font-size:14px;color:var(--mid);margin-top:6px;line-height:1.55}
@@ -485,10 +488,13 @@ body{max-width:100%;overscroll-behavior-x:none}
 .rng label{align-items:center;gap:10px}.rng label b{white-space:nowrap;color:var(--hi,#111318)}
 .sim-note b{color:var(--mid,#475467)}
 .sim-bars{display:flex;flex-direction:column;gap:12px;margin-top:12px}
-.sim-bars>div{display:grid;grid-template-columns:120px 1fr 64px;align-items:center;gap:10px;font-size:13px;color:var(--on-dark-mid,#9AA4B2)}
-.sim-bars .tr{height:12px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
-.sim-bars i{display:block;height:100%;border-radius:999px;background:#6B7280;transition:width .45s cubic-bezier(.2,.8,.2,1)}
+.sim-bars>div{display:grid;grid-template-columns:104px 1fr 62px;align-items:center;gap:10px;font-size:13px;color:var(--on-dark-mid,#9AA4B2)}
+.sim-bars .tr{position:relative;height:14px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden}
+.sim-bars i{position:absolute;left:0;top:0;display:block;height:100%;border-radius:999px;background:#4B5563;transition:width .45s cubic-bezier(.2,.8,.2,1)}
 .sim-bars i.n{background:var(--neon);box-shadow:0 0 12px rgba(226,255,26,.5)}
+.sim-bars b{color:var(--neon)!important}
+.sim-leg{display:flex;gap:14px;margin-top:10px;font-size:11.5px;color:var(--on-dark-mid,#9AA4B2)}.sim-leg i{display:inline-block;width:10px;height:10px;border-radius:3px;background:#4B5563;margin-right:5px;vertical-align:-1px}.sim-leg i.n{background:var(--neon)}
+.sim-grp{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--neon-ink,#6B6F00);margin-top:4px}
 .sim-bars b{color:#fff;text-align:right;font-weight:600}
 .sim-eq{font-size:14px;color:#C9CFD8;margin-top:8px}
 @media(max-width:480px){.sim-bars>div{grid-template-columns:96px 1fr 56px;font-size:12px}.rng label{flex-direction:column;align-items:flex-start;gap:4px}}
@@ -612,7 +618,7 @@ html{overflow-anchor:auto}
 <div class="marquee" aria-hidden="true"><div class="track" id="track"></div></div>
 
 <!-- PARA ONDE VAI O SEU DIA -->
-<section class="rev" id="dia" style="padding:64px 0 48px">
+<section class="rev" id="dia">
   <div class="wrap">
     <div class="dia-hd">
       <div style="max-width:640px"><h2>Para onde vai o seu dia?</h2><p class="lead" style="margin-top:12px">A maior parte do expediente vai para trabalho que não é faturado: redigir do zero, abrir abas atrás de ementa, conferir andamento. Veja o mesmo dia, lado a lado.</p></div>
@@ -629,7 +635,7 @@ html{overflow-anchor:auto}
 </section>
 
 <!-- TOUR -->
-<section class="rev" id="tour" style="padding-top:16px">
+<section class="rev" id="tour">
   <div class="wrap">
     <div style="max-width:760px;margin-bottom:40px"><h2>O produto, tela por tela.</h2><p class="lead" style="margin-top:12px">São as mesmas telas que você vai abrir ao clicar em Testar grátis. Nada aqui é maquete.</p></div>
     <div class="tour">
@@ -668,20 +674,27 @@ html{overflow-anchor:auto}
 <!-- SIMULADOR -->
 <section class="rev" id="contas">
   <div class="wrap">
-    <div style="max-width:760px;margin-bottom:32px"><h2>Quantas horas você recupera por mês?</h2><p class="lead" style="margin-top:12px">Responda 3 perguntas sobre a sua rotina. A conta aparece na hora.</p></div>
+    <div style="max-width:760px;margin-bottom:32px"><h2>Quantas horas você recupera por mês?</h2><p class="lead" style="margin-top:12px">Peças, pesquisas e a gestão do escritório. Mova os controles com a sua rotina e a conta aparece na hora.</p></div>
     <div class="sim">
       <div class="sim-in">
-        <div class="rng"><label><span><span class="sim-q">1</span>Quantas peças você faz por semana?</span> <b id="v-pecas"></b></label><input type="range" id="i-pecas" min="1" max="30" value="6" aria-label="Peças por semana"></div>
+        <div class="sim-grp">Peças</div>
+        <div class="rng"><label><span><span class="sim-q">1</span>Quantas peças você faz por semana?</span> <b id="v-pecas"></b></label><input type="range" id="i-pecas" min="0" max="30" value="6" aria-label="Peças por semana"></div>
         <div class="rng"><label><span><span class="sim-q">2</span>Quanto tempo leva cada peça hoje?</span> <b id="v-hp"></b></label><input type="range" id="i-hp" min="0.5" max="8" step="0.5" value="2" aria-label="Horas por peça"></div>
-        <div class="rng"><label><span><span class="sim-q">3</span>Quanto vale uma hora do seu trabalho?</span> <b id="v-hora"></b></label><input type="range" id="i-hora" min="80" max="1000" step="10" value="250" aria-label="Valor da sua hora"></div>
-        <p class="sim-note"><b>Como a conta é feita:</b> o JurisClik entrega a primeira versão da peça e você revisa. Estimamos que cada peça passe a levar cerca de 30% do tempo de hoje. É uma estimativa: o resultado real depende da sua rotina.</p>
+        <div class="sim-grp">Pesquisa e gestão</div>
+        <div class="rng"><label><span><span class="sim-q">3</span>Quantas pesquisas de jurisprudência por semana?</span> <b id="v-pesq"></b></label><input type="range" id="i-pesq" min="0" max="30" value="4" aria-label="Pesquisas por semana"></div>
+        <div class="rng"><label><span><span class="sim-q">4</span>Horas por semana com prazos, agenda, clientes e cobranças?</span> <b id="v-ges"></b></label><input type="range" id="i-ges" min="0" max="20" step="0.5" value="5" aria-label="Horas por semana com gestão"></div>
+        <div class="sim-grp">Seu valor</div>
+        <div class="rng"><label><span><span class="sim-q">5</span>Quanto vale uma hora do seu trabalho?</span> <b id="v-hora"></b></label><input type="range" id="i-hora" min="80" max="1000" step="10" value="250" aria-label="Valor da sua hora"></div>
+        <p class="sim-note"><b>Como a conta é feita:</b> a peça passa a levar cerca de 30% do tempo de hoje (a IA faz a primeira versão e você revisa); cada pesquisa com link do tribunal poupa cerca de 20 minutos; e a gestão (prazos calculados sozinhos, "Seu dia", cobrança e recibo com um toque) leva cerca de 40% menos tempo. São estimativas: o resultado real depende da sua rotina.</p>
       </div>
       <div class="sim-out">
-        <div class="lb">Tempo com peças por mês</div>
+        <div class="lb">Horas por mês: hoje × com o JurisClik</div>
         <div class="sim-bars">
-          <div><span>Hoje</span><div class="tr"><i id="b-hoje"></i></div><b class="tabular" id="o-hoje"></b></div>
-          <div><span>Com o JurisClik</span><div class="tr"><i id="b-com" class="n"></i></div><b class="tabular" id="o-com"></b></div>
+          <div><span>Peças</span><div class="tr"><i id="b-pec-h"></i><i id="b-pec-c" class="n"></i></div><b class="tabular" id="o-pec"></b></div>
+          <div><span>Jurisprudência</span><div class="tr"><i id="b-jur-h"></i><i id="b-jur-c" class="n"></i></div><b class="tabular" id="o-jur"></b></div>
+          <div><span>Gestão</span><div class="tr"><i id="b-ges-h"></i><i id="b-ges-c" class="n"></i></div><b class="tabular" id="o-ges"></b></div>
         </div>
+        <div class="sim-leg"><span><i></i>Hoje</span><span><i class="n"></i>Com o JurisClik</span></div>
         <hr>
         <div class="lb">Você recupera por mês</div>
         <div class="big tabular"><span id="o-mes"></span></div>
@@ -1096,20 +1109,21 @@ $$("[data-count]").forEach(el=>cnt.observe(el));
 const fmtH=h=>(Number.isInteger(h)?h:h.toFixed(1)).toString().replace(".",",")+" h";
 const brl0=v=>brl(v).replace(",00","");
 function simular(){
-  const pecas=+$("#i-pecas").value, hp=+$("#i-hp").value, hora=+$("#i-hora").value;
-  $("#v-pecas").textContent=pecas+(pecas===1?" peça":" peças"); $("#v-hp").textContent=fmtH(hp); $("#v-hora").textContent=brl0(hora);
-  const hHoje=pecas*hp*4.3, hCom=hHoje*0.3, rec=hHoje-hCom, val=rec*hora, dias=rec/8;
-  $("#o-hoje").textContent=fmtH(Math.round(hHoje)); $("#o-com").textContent=fmtH(Math.round(hCom));
-  $("#b-hoje").style.width="100%"; $("#b-com").style.width=Math.max(6,hCom/hHoje*100)+"%";
+  const pecas=+$("#i-pecas").value, hp=+$("#i-hp").value, pesq=+$("#i-pesq").value, ges=+$("#i-ges").value, hora=+$("#i-hora").value;
+  $("#v-pecas").textContent=pecas+(pecas===1?" peça":" peças"); $("#v-hp").textContent=fmtH(hp); $("#v-pesq").textContent=pesq+(pesq===1?" pesquisa":" pesquisas"); $("#v-ges").textContent=fmtH(ges); $("#v-hora").textContent=brl0(hora);
+  const S=4.3, pecH=pecas*hp*S, pecC=pecH*0.3, jurH=pesq*(30/60)*S, jurC=pesq*(10/60)*S, gesH=ges*S, gesC=gesH*0.6;
+  const max=Math.max(pecH,jurH,gesH,1);
+  [["pec",pecH,pecC],["jur",jurH,jurC],["ges",gesH,gesC]].forEach(([k,h,c])=>{ $("#b-"+k+"-h").style.width=(h/max*100)+"%"; $("#b-"+k+"-c").style.width=(c/max*100)+"%"; $("#o-"+k).textContent=h>0?"−"+fmtH(Math.round(h-c)):"—"; });
+  const rec=(pecH-pecC)+(jurH-jurC)+(gesH-gesC), val=rec*hora, dias=rec/8;
   $("#o-mes").textContent=fmtH(Math.round(rec));
-  $("#o-eq").textContent= dias>=1 ? "É como ganhar "+(Math.round(dias*2)/2).toString().replace(".",",")+" dia"+(dias>=1.5?"s":"")+" inteiro"+(dias>=1.5?"s":"")+" de trabalho (8 h) por mês." : "Menos de um dia de trabalho por mês, mas já tempo livre para atender mais.";
+  $("#o-eq").textContent= dias>=1 ? "É como ganhar "+(Math.round(dias*2)/2).toString().replace(".",",")+" dia"+(dias>=1.5?"s":"")+" inteiro"+(dias>=1.5?"s":"")+" de trabalho (8 h) por mês, entre peças, pesquisas e gestão do escritório." : "Menos de um dia por mês, mas já tempo livre para atender mais.";
   $("#o-val").textContent=brl0(Math.round(val))+"/mês";
   const n=Math.max(1,Math.ceil(ANUAL_MES/hora));
   $("#o-verd").textContent= val>ANUAL_MES ? "O plano anual se paga com "+n+" hora"+(n>1?"s":"")+" recuperada"+(n>1?"s":"")+" no mês. Pela sua conta, você recupera "+fmtH(Math.round(rec))+"." : "Com esses números, o ganho maior é de organização. Ajuste os valores para a sua rotina.";
-  const pecasMes=Math.round(pecas*4.3);
+  const pecasMes=Math.round(pecas*S);
   if(pecasMes<=P.essencial.pecas){ $("#o-plano").textContent=`Essencial ou Anual (${P.essencial.creditos} créditos)`; }
   else { $("#o-plano").textContent=`Pro (${P.pro.creditos} créditos)`; }
-  $("#o-plano-nt").textContent=`Cerca de ${pecasMes} peças por mês. Peças feitas a partir dos seus modelos não gastam créditos.`;
+  $("#o-plano-nt").textContent=`Cerca de ${pecasMes} peças por mês. A gestão do escritório é ilimitada, e peças feitas a partir dos seus modelos não gastam créditos.`;
   $$("input[type=range]").forEach(r=>{const p=((r.value-r.min)/(r.max-r.min))*100; r.style.background=`linear-gradient(90deg,#E2FF1A ${p}%,#E5E7EB ${p}%)`;});
 }
 $$("input[type=range]").forEach(r=>r.addEventListener("input",simular)); simular();
